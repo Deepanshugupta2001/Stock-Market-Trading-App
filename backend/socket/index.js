@@ -1,0 +1,128 @@
+import { Server } from "socket.io";
+import Stock from "../model/Stock.js";
+// import { stockData } from "../http/services/stock.service.js";
+import { getPrices, updatePrices } from "../http/services/priceCache.js";
+
+let activeSymbols = new Set();
+let userSubscriptions = new Map();
+
+export function startsocket(httpServer){
+
+    const io = new Server(httpServer,{
+    cors: {
+        origin: "http://localhost:5173"
+    }
+});
+
+    io.on("connection", (socket) => {
+
+    console.log("Client connected:", socket.id);
+
+    socket.on("subscribe", (watchlist) => {
+
+      console.log("User subscribed:", watchlist);
+
+      userSubscriptions.set(socket.id, watchlist);
+
+      watchlist.forEach(symbol => {
+        if (symbol) activeSymbols.add(symbol);
+      });
+
+      const prices = getPrices(watchlist);
+
+  if (prices.length > 0) {
+    socket.emit("prices", prices);
+    console.log("Sent instant prices:", prices);
+  } else {
+    // console.log("No cached prices yet");
+    socket.emit("prices", watchlist.map(s => ({
+    symbol: s,
+    price: null
+  })))
+  }
+    });
+
+    socket.on("disconnect", () => {
+
+      console.log("Client disconnected:", socket.id);
+
+      userSubscriptions.delete(socket.id);
+
+      rebuildActiveSymbols();
+
+    });
+
+  });
+
+// setInterval(async () => {
+
+//   const symbols = [...activeSymbols];
+
+//   if (!symbols.length) return;
+
+//   console.log("Fetching prices for:", symbols);
+
+//   await updatePrices(symbols);
+
+//   const priceCache = getPrices(symbols);
+
+//   io.sockets.sockets.forEach((socket) => {
+
+//     const watchlist = userSubscriptions.get(socket.id);
+
+//     if (!watchlist) return;
+
+//     const prices = watchlist
+//       .map(symbol => priceCache.find(p => p.symbol === symbol))
+//       .filter(Boolean);
+
+//     socket.emit("prices", prices);
+
+//   });
+
+// }, 5000);
+// }
+
+setInterval(async () => {
+
+  const symbols = [...activeSymbols];
+
+  if (symbols.length === 0) return;
+
+  await updatePrices(symbols);
+
+  io.sockets.sockets.forEach((socket) => {
+
+    const watchlist = userSubscriptions.get(socket.id);
+
+    if (!watchlist) return;
+
+    const prices = getPrices(watchlist);
+
+    if (prices.length > 0) {
+      socket.emit("prices", prices);
+    } else {
+      socket.emit("prices", watchlist.map(s => ({
+        symbol: s,
+        price: null
+      })));
+    }
+
+  });
+
+}, 15000); 
+}
+
+function rebuildActiveSymbols() {
+
+  activeSymbols.clear();
+
+  userSubscriptions.forEach((watchlist) => {
+
+    watchlist.forEach(symbol => {
+      if (symbol) activeSymbols.add(symbol);
+    });
+
+  });
+
+}
