@@ -9,49 +9,31 @@ const Watchlist = ({ onSelectStock }) => {
   const {watchlist , stock } = useStock();
 
   return (
-    // <div>
-
-    //   <h3>Your Watchlist</h3>
-
-    //   {Array.isArray(stock) && stock.map((symbol) => (
-
-    //     <div
-    //       key={symbol}
-    //       onClick={() => onSelectStock(symbol)}
-    //       style={{cursor:"pointer"}}
-    //     >
-    //       {symbol}
-    //     </div>
-
-    //   ))}
-
-    // </div>
-//     <div>
-//     <h3>Your Watchlist</h3>
-
-//     {watchlist.map(symbol => {
-
-//       const priceData = stock.find(s => s.symbol === symbol);
-
-//       return (
-//         <div key={symbol}>
-//           {symbol} : {priceData ? `₹${priceData.price}` : "Loading..."}
-//         </div>
-//       );
-
-//     })}
-
-//   </div>
      <div>
     <h3>Your Watchlist</h3>
 
     {watchlist.map(symbol => {
 
-      const priceData = stock.find(s => s.symbol === symbol);
+      const priceData = stock.find(s => s && s.symbol && s.symbol.toUpperCase() === symbol.toUpperCase());
 
       return (
-        <div key={symbol}>
-          {symbol} : {priceData?.price ?? "Loading..."}
+        <div 
+          key={symbol} 
+          onClick={() => onSelectStock && onSelectStock(symbol)}
+          style={{cursor: "pointer", padding: "8px", borderBottom: "1px solid #ccc", display: "flex", justifyContent: "space-between", alignItems: "center"}}
+        >
+          <span><strong>{symbol.toUpperCase()}</strong></span>
+          {priceData ? (
+            <span>
+              ₹{priceData.price}{" "}
+              <span style={{ color: priceData.change >= 0 ? "green" : "red" }}>
+                {priceData.change >= 0 ? "+" : ""}{priceData.change?.toFixed(2)}{" "}
+                ({priceData.percent?.toFixed(2)}%)
+              </span>
+            </span>
+          ) : (
+            <span>Loading...</span>
+          )}
         </div>
       );
 

@@ -92,6 +92,14 @@ async function loadWallet() {
     return response.data.data;
 }
 
+async function searchStock(query) {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`/api/stock/search/${query}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data.data;
+}
+
 export const stockApi ={
     getQuote,
     getWatchlist,
@@ -100,4 +108,5 @@ export const stockApi ={
     withdrawMoney,
     transactions,
     loadWallet,
+    searchStock,
 }
