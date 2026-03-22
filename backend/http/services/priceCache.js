@@ -1,9 +1,9 @@
-import yahooFinance from "yahoo-finance2";
+// import yahooFinance from "yahoo-finance2";
 
-let cache = {};
+// let cache = {};
 // let lastFetchTime = 0;
-let index = 0;
-export async function updatePrices(symbols) {
+// let index = 0;
+// export async function updatePrices(symbols) {
 //   try {
 
 //     for (const symbol of symbols) {
@@ -33,30 +33,30 @@ export async function updatePrices(symbols) {
 //     console.error("Yahoo Error:", error.message);
 //   }
 
-try {
+// try {
 
-    if (symbols.length === 0) return;
+//     if (symbols.length === 0) return;
 
-    const symbol = symbols[index % symbols.length];
-    index++;
+//     const symbol = symbols[index % symbols.length];
+//     index++;
 
-    console.log("Fetching:", symbol);
+//     console.log("Fetching:", symbol);
 
-    const q = await yahooFinance.quote(symbol);
+//     const q = await yahooFinance.quote(symbol);
 
-    cache[q.symbol] = {
-      symbol: q.symbol,
-      price: q.regularMarketPrice,
-      change: q.regularMarketChange,
-      percent: q.regularMarketChangePercent
-    };
+//     cache[q.symbol] = {
+//       symbol: q.symbol,
+//       price: q.regularMarketPrice,
+//       change: q.regularMarketChange,
+//       percent: q.regularMarketChangePercent
+//     };
 
-    console.log("CACHE:", cache);
+//     console.log("CACHE:", cache);
 
-  } catch (error) {
-    console.log("Skipping symbol:", symbols[index % symbols.length]);
-  }
-}
+//   } catch (error) {
+//     console.log("Skipping symbol:", symbols[index % symbols.length]);
+//   }
+// }
 
 
 // export async function updatePrices(symbols) {
@@ -94,13 +94,13 @@ try {
 //     }
 // }
 
-export function getPrices(symbols) {
+// export function getPrices(symbols) {
 
-  return symbols
-    .map(symbol => cache[symbol])
-    .filter(Boolean);
+//   return symbols
+//     .map(symbol => cache[symbol])
+//     .filter(Boolean);
 
-}
+// }
 
 // import yahooFinance from "yahoo-finance2";
 
@@ -124,3 +124,45 @@ export function getPrices(symbols) {
 // export function getPrices(symbols){
 //   return symbols.map(s => cache[s]).filter(Boolean);
 // }
+
+import YahooFinance from "yahoo-finance2";
+const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+
+let cache = {};
+let index = 0;
+
+// Fetch ONE symbol per call to avoid Yahoo rate limits
+export async function updatePrices(symbols) {
+  if (symbols.length === 0) return;
+
+  // Deduplicate and uppercase
+  const unique = [...new Set(symbols.map(s => s.toUpperCase()))];
+  if (unique.length === 0) return;
+
+  // Round-robin: fetch one symbol per interval tick
+  const symbol = unique[index % unique.length];
+  index++;
+
+  try {
+    console.log("Fetching price for:", symbol);
+    const q = await yahooFinance.quote(symbol);
+
+    if (q && q.symbol) {
+      cache[q.symbol.toUpperCase()] = {
+        symbol: q.symbol,
+        price: q.regularMarketPrice,
+        change: q.regularMarketChange,
+        percent: q.regularMarketChangePercent
+      };
+      console.log("Cached:", q.symbol, q.regularMarketPrice);
+    }
+  } catch (err) {
+    console.log("Skipping symbol:", symbol, "-", err.message || err);
+  }
+}
+
+export function getPrices(symbols) {
+  return symbols
+    .map(symbol => cache[symbol.toUpperCase()])
+    .filter(Boolean);
+}

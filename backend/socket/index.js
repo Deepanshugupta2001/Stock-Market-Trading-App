@@ -85,7 +85,9 @@ export function startsocket(httpServer){
 
 setInterval(async () => {
 
-  const symbols = [...activeSymbols];
+  // const symbols = [...activeSymbols];
+   // Convert Set to Array and deduplicate just in case
+  const symbols = [...new Set(activeSymbols)];
 
   if (symbols.length === 0) return;
 
@@ -110,7 +112,7 @@ setInterval(async () => {
 
   });
 
-}, 15000); 
+}, 3000); 
 }
 
 function rebuildActiveSymbols() {

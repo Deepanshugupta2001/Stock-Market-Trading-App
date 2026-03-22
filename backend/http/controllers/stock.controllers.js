@@ -153,3 +153,20 @@ export async function postLoadWallet(req,res,next) {
         })
     }
 }
+
+export async function getSearchStock(req, res, next) {
+    try {
+        const { query } = req.params;
+        if (!query) {
+            return res.status(400).json({ message: "Search query required" });
+        }
+        const data = await searchStock(query);
+        res.status(200).json({ data });
+    } catch (error) {
+        console.error("Search API Error:", error);
+        res.status(500).json({
+            message: "Cannot search stock",
+            error: error.message
+        })
+}
+}

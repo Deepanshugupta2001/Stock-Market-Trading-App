@@ -1,7 +1,10 @@
-import yahooFinance from "yahoo-finance2";
+// import yahooFinance from "yahoo-finance2";
+import YahooFinance from "yahoo-finance2";
 import Stock from '../../model/Stock.js';
 
-yahooFinance.suppressNotices(["yahooSurvey"]);
+const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+
+// yahooFinance.suppressNotices(["yahooSurvey"]);
 
 let lastFetch = 0 ;
 export async function stockData(symbol , retries = 3) {
@@ -112,6 +115,24 @@ export async function withdrawmoney(userId,amt) {
 export async function transactions(userId) {
     const user = await Stock.findById(userId);
     return user.transactions;
+}
+
+export async function searchStock(query) {
+    try {
+        const results = await yahooFinance.search(query);
+        if (!results || !results.quotes) return [];
+        
+        return results.quotes.map(q => ({
+            symbol: q.symbol,
+            shortname: q.shortname || q.longname,
+            exchange: q.exchange,
+            typeDisp: q.typeDisp
+        }));
+    } catch (error) {
+        console.error("Yahoo search error:", error.message || error);
+        // If Yahoo rate limits us, return an empty array so it doesn't break the app
+        return [];
+    }
 }
 
 export async function loadWallet(userId) {

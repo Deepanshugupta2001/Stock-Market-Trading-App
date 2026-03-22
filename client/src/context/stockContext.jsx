@@ -24,7 +24,7 @@ export const StockProvider = ({children}) =>{
 
     async function addStock(symbol) {
         const data = await stockApi.addWatchlist(symbol);
-        // await loadWatchlist();
+        await loadWatchlist();
         return data ;
     }
 

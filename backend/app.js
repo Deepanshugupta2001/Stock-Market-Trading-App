@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
-import yahooFinance from 'yahoo-finance2';
+// import yahooFinance from 'yahoo-finance2';
 
 import { createServer } from "http" ;
 import { Server } from "socket.io";

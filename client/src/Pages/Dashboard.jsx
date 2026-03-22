@@ -28,7 +28,8 @@ const Dashboard = () => {
       {/* <StockDetails/> */}
       {/* <Watchlist onSelectStock={setSelectedStock} /> } */}
 
-       <Watchlist/>
+       {/* <Watchlist/> */}
+      <Watchlist onSelectStock={setSelectedStock} />
 
     </div>
 
