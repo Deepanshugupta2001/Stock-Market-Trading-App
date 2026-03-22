@@ -25,10 +25,7 @@ const Dashboard = () => {
 
       <SearchStock/>
       <StockDetails symbol={selectedStock} />
-      {/* <StockDetails/> */}
-      {/* <Watchlist onSelectStock={setSelectedStock} /> } */}
-
-       <Watchlist/>
+      <Watchlist onSelectStock={setSelectedStock} />
 
     </div>
 

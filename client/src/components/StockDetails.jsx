@@ -86,7 +86,7 @@ const StockDetails = ({ symbol }) => {
 
   const { stock } = useStock();
 
-  const selectedStock = stock.find(s => s.symbol === symbol);
+  const selectedStock = stock.find(s => s && s.symbol && symbol && s.symbol.toUpperCase() === symbol.toUpperCase());
 
   if (!symbol) {
     return <div>Select a stock to view details</div>;

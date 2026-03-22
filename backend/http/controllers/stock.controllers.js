@@ -1,5 +1,5 @@
 import Stock from "../../model/Stock.js";
-import { addmoney, addWatchlist, loadWallet, stockData, transactions, watchlist, withdrawmoney } from "../services/stock.service.js";
+import { addmoney, addWatchlist, loadWallet, stockData, transactions, watchlist, withdrawmoney, searchStock } from "../services/stock.service.js";
 
 export async function postStockData(req,res,next) {
     try {
@@ -150,6 +150,23 @@ export async function postLoadWallet(req,res,next) {
         res.status(500).json({
             message :"Cannot Load Wallet",
             error : error.message
+        })
+    }
+}
+
+export async function getSearchStock(req, res, next) {
+    try {
+        const { query } = req.params;
+        if (!query) {
+            return res.status(400).json({ message: "Search query required" });
+        }
+        const data = await searchStock(query);
+        res.status(200).json({ data });
+    } catch (error) {
+        console.error("Search API Error:", error);
+        res.status(500).json({
+            message: "Cannot search stock",
+            error: error.message
         })
     }
 }
