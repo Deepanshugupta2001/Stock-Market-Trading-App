@@ -28,6 +28,12 @@ export const StockProvider = ({children}) =>{
         return data ;
     }
 
+    async function removeStock(symbol){
+        const data = await stockApi.removeStockFromWatchlist(symbol);
+        await loadWatchlist();
+        return data;
+    }
+
     async function addmoney(amt) {
         // setWal(wal+amt);
         const data = await stockApi.addMoney(amt);
@@ -56,6 +62,12 @@ export const StockProvider = ({children}) =>{
         setWal(data);
         return data;
     }
+
+    async function showChart(symbol,range) {
+        const data = await stockApi.showCharts(symbol,range);
+        return data;
+    }
+
     useEffect(()=>{
         console.log("Watchlist Loading");
         loadWatchlist();
@@ -93,6 +105,8 @@ export const StockProvider = ({children}) =>{
             transactions,
             transaction,
             loadWallet,
+            removeStock,
+            showChart
         }}>
             {children}
         </stockcontext.Provider>

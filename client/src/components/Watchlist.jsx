@@ -6,7 +6,15 @@ import useStock from '../context/stockContext';
 
 const Watchlist = ({ onSelectStock }) => {
 
-  const {watchlist , stock } = useStock();
+  const {watchlist , stock ,removeStock , showChart} = useStock();
+
+  const removeHandler = async (symbol)=>{
+    const data = await removeStock(symbol);
+  }
+
+  // const showCharts = async (symbol)=>{
+  //   const data = await showChart(symbol);
+  // }
 
   return (
     // <div>
@@ -70,7 +78,13 @@ const Watchlist = ({ onSelectStock }) => {
           ) : (
             <span>Loading...</span>
           )}
+          <button onClick={(e)=>{
+            e.stopPropagation();
+            onSelectStock(symbol);
+          }}>Show Chart</button>
+          <button onClick={()=> removeHandler(symbol)}>Remove</button>
         </div>
+
       );
 
     })}

@@ -8,6 +8,7 @@ import Watchlist from '../components/Watchlist';
 import { useState } from 'react';
 import useStock from '../context/stockContext';
 import { useEffect } from 'react';
+import ShowCharts from '../components/ShowCharts';
 
 const Dashboard = () => {
   const {logout} = useAuth();
@@ -30,6 +31,14 @@ const Dashboard = () => {
 
        {/* <Watchlist/> */}
       <Watchlist onSelectStock={setSelectedStock} />
+
+      {
+        selectedStock && (
+          <div style={{marginTop: "20px"}}>
+            <ShowCharts symbol={selectedStock}/>
+          </div>
+        )
+      }
 
     </div>
 

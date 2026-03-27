@@ -2,7 +2,9 @@
 import YahooFinance from "yahoo-finance2";
 import Stock from '../../model/Stock.js';
 
-const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+const yahooFinance = new YahooFinance({ 
+    suppressNotices: ["yahooSurvey"]
+});
 
 // yahooFinance.suppressNotices(["yahooSurvey"]);
 
@@ -64,14 +66,14 @@ export async function addWatchlist(userId,symbol) {
     return true;
 }
 
-// export async function removeWatchlist(userId,symbol) {
-//     await Stock.updateOne(
-//         {_id : userId},
-//         {$pull: {watchlist : symbol}}
-//     )
+export async function removeWatchlist(userId,symbol) {
+    await Stock.updateOne(
+        {_id : userId},
+        {$pull: {watchlist : symbol}}
+    )
 
-//     return true;
-// }
+    return true;
+}
 
 export async function addmoney(userId,amt) {
     console.log("UserID and Amount is ", userId,amt);
@@ -138,4 +140,78 @@ export async function searchStock(query) {
 export async function loadWallet(userId) {
     const user = await Stock.findById(userId);
     return user.wallet;
+}
+
+export async function getStockChart(symbol,range) {
+    try {
+    if (!symbol || symbol.trim() === "") {
+      throw new Error("Invalid Symbol");
+    }
+
+    const now = new Date();
+    const past = new Date();
+    let interval ;
+
+    switch (range) {
+      case "1D": past.setDate(now.getDate() - 1); interval ="5m"; break;
+      case "1W": past.setDate(now.getDate() - 7); interval ="15m"; break;
+      case "1M": past.setMonth(now.getMonth() - 1); interval ="1h" ;break;
+      case "3M": past.setMonth(now.getMonth() - 3);interval ="1d"; break;
+      case "6M": past.setMonth(now.getMonth() - 6); interval ="1d" ; break;
+      case "1Y": past.setFullYear(now.getFullYear() - 1); interval ="1d";break;
+      default: past.setMonth(now.getMonth() - 1);
+    }
+    const response = await yahooFinance.chart(symbol, {
+      period1: past,
+      period2: now,
+      interval
+    });
+
+    const result = response?.quotes || [];
+
+    console.log("CHART RAW:", result); // 🔥 DEBUG
+
+    if (!result.length) return [];
+
+    // return result
+    //   .filter(item =>
+    //     item &&
+    //     item.close != null &&
+    //     !isNaN(item.close) &&
+    //     item.date
+    //   )
+    //   .map(item => ({
+    //     time: new Date(item.date).toISOString().split("T")[0],
+    //     value: Number(item.close)
+    //   }));
+
+    const formatted = result
+        .filter(item =>
+            item &&
+            item.close != null &&
+            !isNaN(item.close) &&
+            item.date
+        )
+        .map(item => ({
+            time: Math.floor(new Date(item.date).getTime() / 1000), 
+            value: Number(item.close)
+        }))
+        .sort((a, b) => a.time - b.time);
+
+        const unique = [];
+        const seen = new Set();
+
+        for (let d of formatted) {
+        if (!seen.has(d.time)) {
+            seen.add(d.time);
+            unique.push(d);
+        }
+        }
+
+        return unique;
+
+  } catch (error) {
+    console.error("Chart Error:", error);
+    return [];
+  }
 }

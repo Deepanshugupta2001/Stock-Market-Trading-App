@@ -1,5 +1,5 @@
 import Stock from "../../model/Stock.js";
-import { addmoney, addWatchlist, loadWallet, stockData, transactions, watchlist, withdrawmoney } from "../services/stock.service.js";
+import { addmoney, addWatchlist, getStockChart, loadWallet, removeWatchlist, searchStock, stockData, transactions, watchlist, withdrawmoney } from "../services/stock.service.js";
 
 export async function postStockData(req,res,next) {
     try {
@@ -12,7 +12,7 @@ export async function postStockData(req,res,next) {
 //     const userId = req.user._id;
 //   const user = await Stock.findById(userId);
 //   const symbol = user.watchlist;
-const symbol = req.params.symbol;
+    const symbol = req.params.symbol;
 
     if (!symbol) {
       return res.status(400).json({
@@ -69,22 +69,22 @@ export async function postAddStock(req,res,next) {
     }
 }
 
-// export async function postRemoveStock(req,res,next) {
-//     const userId = req.user._id;
-//     const {symbol} = req.params.symbol;
-//     try {
-//         const data = await removeWatchlist(userId,symbol);
+export async function postRemoveStock(req,res,next) {
+    const userId = req.user._id;
+    const {symbol} = req.params;
+    try {
+        const data = await removeWatchlist(userId,symbol);
 
-//         res.status(200).json({
-//             data
-//         });        
-//     } catch (error) {
-//         res.status(500).json({
-//             message: 'Error While Removing Stock from Watchlist',
-//             error : error.message
-//         })
-//     }
-// }
+        res.status(200).json({
+            data
+        });        
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error While Removing Stock from Watchlist',
+            error : error.message
+        })
+    }
+}
 
 export async function postAddMoney(req,res,next) {
     const userId = req.user._id ;
@@ -169,4 +169,22 @@ export async function getSearchStock(req, res, next) {
             error: error.message
         })
 }
+}
+
+export async function postShowCharts(req,res,next) {
+    try {
+        const {symbol} = req.params;
+        const {range} = req.query;
+
+        const data = await getStockChart(symbol,range);
+        res.status(200).json({
+            data
+        })
+    } catch (error) {
+        console.log("Cannot Get Old Stock Data",error);
+        res.status(500).json({
+            message: "Cannot Get Charts ",
+            error :error.message
+        })
+    }
 }

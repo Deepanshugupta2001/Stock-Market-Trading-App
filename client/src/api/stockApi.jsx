@@ -38,6 +38,19 @@ async function addWatchlist(symbol){
   return data;
 }
 
+async function removeStockFromWatchlist(symbol) {
+    const token = localStorage.getItem("token");
+  
+    const response = await axios.delete(`/api/stock/watchlist/${symbol}`,
+      {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }}
+    );
+
+    return response.data.data ;
+}
+
 async function addMoney(amt) {
     const token = localStorage.getItem("token");
   
@@ -100,6 +113,18 @@ async function searchStock(query) {
     return response.data.data;
 }
 
+async function showCharts(symbol,range) {
+    const token = localStorage.getItem("token");
+  const response = await axios.get(`/api/stock/chart/${symbol}?range=${range}`,
+    {
+        headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+
+  return response.data.data;
+  
+}
+
 export const stockApi ={
     getQuote,
     getWatchlist,
@@ -108,5 +133,7 @@ export const stockApi ={
     withdrawMoney,
     transactions,
     loadWallet,
-    searchStock
+    searchStock,
+    removeStockFromWatchlist,
+    showCharts
 }
