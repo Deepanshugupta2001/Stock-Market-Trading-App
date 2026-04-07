@@ -11,6 +11,9 @@ import Wallet from './Pages/Wallet'
 import AddMoney from './Pages/AddMoney'
 import WithdrawMoney from './Pages/WithdrawMoney'
 import Transcations from './Pages/Transcations'
+import Portfolio from './Pages/Portfolio'
+import Orders from './Pages/Orders'
+import Holdings from './Pages/Holdings'
 
 const App = () => {
   const {isLoggedIn} = useAuth();
@@ -36,6 +39,9 @@ const App = () => {
         <Route path='/addmoney' element={<AddMoney/>} />
         <Route path='/withdrawmoney' element={<WithdrawMoney/>} />
         <Route path='/transactions' element={<Transcations/>} />
+        <Route path='/portfolio' element={<Portfolio/>} />
+        <Route path='/orders' element={<Orders/>}/>
+        <Route path='/holdings' element={<Holdings/>} />
       </Routes>
   )
 }

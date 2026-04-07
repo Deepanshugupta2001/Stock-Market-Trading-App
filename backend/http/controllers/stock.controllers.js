@@ -1,5 +1,5 @@
 import Stock from "../../model/Stock.js";
-import { addmoney, addWatchlist, getStockChart, loadWallet, removeWatchlist, searchStock, stockData, transactions, watchlist, withdrawmoney } from "../services/stock.service.js";
+import { addmoney, addStockOrderList, addWatchlist, buyStock, getOrderList, getStockChart, loadWallet, removeWatchlist, searchStock, sellStock, stockData, transactions, watchlist, withdrawmoney } from "../services/stock.service.js";
 
 export async function postStockData(req,res,next) {
     try {
@@ -185,6 +185,83 @@ export async function postShowCharts(req,res,next) {
         res.status(500).json({
             message: "Cannot Get Charts ",
             error :error.message
+        })
+    }
+}
+
+export async function postBuyStock(req,res,next) {
+    console.log("Ma controller ma aa gaya hu ");
+    const userId = req.user._id;
+    try {
+        console.log("Ma try ma gaya hu ");
+        const {symbol} = req.body;
+        const price = req.body.price;
+        const {quantity} = req.body;
+
+        const data = await buyStock(symbol,price,quantity,userId);
+        res.status(200).json({
+            data
+        })
+    } catch (error) {
+        console.log("Cannot Purchase Stock",error);
+        res.status(500).json({
+            message : " Cannot purchase right now",
+            error: error.message
+        })
+    }
+}
+
+export async function postSellStock(req,res,next) {
+    const userId = req.user._id;
+    try {
+        const {symbol} = req.body;
+        const {price} = req.body;
+        const {quantity} = req.body;
+        console.log("Ma controller ma aa gaya hu sell ka");
+        console.log("Ab mera symbol , price , quantity are :",symbol , price , quantity);
+        const data = await sellStock(userId,symbol,price,quantity);
+        res.status(200).json({
+            data
+        })
+    } catch (error) {
+        console.log("Cannot Sell Stock",error);
+        res.status(500).json({
+            message : "Cannot Sell Right Now",
+            error : error.message,
+        })
+    }
+}
+
+export async function postOrderList(req,res,next) {
+    const userId = req.user._id;
+
+    try {
+        const data = await getOrderList(userId);
+        res.status(200).json({
+            data
+        })
+    } catch (error) {
+        console.log("Cannot get Orderlist");
+        res.status(500).json({
+            message: "Cannot Get order List Right Now",
+            error : error.message
+        })        
+    }
+}
+
+export async function postAddStockOrderList(req,res,next) {
+    const userId = req.user._id;
+    const {symbol} = req.body;
+    try {
+        const data = await addStockOrderList(userId,symbol);
+        res.status(200).json({
+            data
+        })
+    } catch (error) {
+        console.log("We are unable to add Stock to Order List");
+        res.status(500).json({
+            message : "We are unable to add Stock to Order List right now",
+            error : error.message,
         })
     }
 }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getSearchStock, getWatchlist, postAddMoney, postAddStock, postLoadWallet, postRemoveStock, postShowCharts, postStockData, postTransactions, postWithdrawMoney } from "../controllers/stock.controllers.js";
+import { getSearchStock, getWatchlist, postAddMoney, postAddStock, postAddStockOrderList, postBuyStock, postLoadWallet, postOrderList, postRemoveStock, postSellStock, postShowCharts, postStockData, postTransactions, postWithdrawMoney } from "../controllers/stock.controllers.js";
 import requireAuth from "../middlewares/requireAuth.js";
 const router= Router();
 
@@ -13,5 +13,9 @@ router.post('/withdrawmoney',requireAuth ,postWithdrawMoney);
 router.get('/transactions',requireAuth,postTransactions);
 router.get('/loadwallet',requireAuth, postLoadWallet);
 router.get('/chart/:symbol',requireAuth,postShowCharts);
+router.post('/portfolio/buy',requireAuth,postBuyStock);
+router.post('/portfolio/sell',requireAuth,postSellStock);
+router.post('/orderlist',requireAuth,postAddStockOrderList);
+router.get('/orderlist',requireAuth,postOrderList);
 
 export default router;

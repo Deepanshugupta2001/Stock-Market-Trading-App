@@ -105,6 +105,33 @@ async function loadWallet() {
     return response.data.data;
 }
 
+async function addOrderList(symbol){
+  const token = localStorage.getItem("token");
+
+
+  const {data:{data}} = await axios.post("/api/stock/orderlist",
+    {symbol},
+    {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }}
+);
+
+  return data;
+}
+
+async function getOrderList(){
+  const token = localStorage.getItem("token");
+
+  const response = await axios.get("/api/stock/orderlist",
+    {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }}
+  );
+
+  return response.data.data ;
+}
 async function searchStock(query) {
     const token = localStorage.getItem("token");
     const response = await axios.get(`/api/stock/search/${query}`, {
@@ -125,6 +152,36 @@ async function showCharts(symbol,range) {
   
 }
 
+async function buyStocK(symbol,price,quantity) {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(`/api/stock/portfolio/buy`,
+    {
+      symbol,
+      price,
+      quantity,
+    },
+    {
+        headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+
+  return response.data.data;
+}
+
+async function sellStocK(symbol,price,quantity) {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(`/api/stock/portfolio/sell`,{
+    symbol,
+    price,
+    quantity
+  },
+  {
+        headers: { Authorization: `Bearer ${token}` }
+    }
+);
+  return response.data.data;
+}
+
 export const stockApi ={
     getQuote,
     getWatchlist,
@@ -135,5 +192,9 @@ export const stockApi ={
     loadWallet,
     searchStock,
     removeStockFromWatchlist,
-    showCharts
+    showCharts,
+    buyStocK,
+    sellStocK,
+    addOrderList,
+    getOrderList,
 }

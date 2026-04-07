@@ -29,7 +29,10 @@ const Wallet = () => {
         <br/>
       Want to See Transcations ? Here you go 
       <button onClick={()=>navigate('/transactions')}>Transactions</button>
-
+    <br/>
+    <br/>
+      Go Back To Dashboard 
+      <button onClick={()=>navigate('/dashboard')}>Dashboard</button>
 
     </div>
   )

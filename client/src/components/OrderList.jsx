@@ -1,92 +1,48 @@
-import React from 'react'
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { stockApi } from '../api/stockApi';
+import React, { useState } from 'react'
 import useStock from '../context/stockContext';
 
-const Watchlist = ({ onSelectStock }) => {
+const OrderList = ({onSelectStock}) => {
 
-  const {watchlist , stock ,removeStock , showChart, setStock,quantity , setQuantity , buyStock , sellStock} = useStock();
-  // let hua = false;
-  const [activeStock,setActiveStock] = useState(null);
-  const [sellStockState,setSellStockState] = useState(null);
-  const [orderType,setOrderType] = useState("market");
-  const [customPrice,setCustomPrice] = useState(0);
-  const removeHandler = async (symbol)=>{
-    const data = await removeStock(symbol);
-  }
-
-  // const showCharts = async (symbol)=>{
-  //   const data = await showChart(symbol);
-  // }
-  const buyHandler = async (symbol,price)=>{
-    setActiveStock(symbol); 
-  }
-
-  const buyFormHandler = async (e,symbol,price) =>{
-    e.preventDefault();
-    let buyPrice;
-    console.log("Mera Frontend par price hai : ",price);
-    console.log("My custom price is: ",customPrice);
-    // buyPrice = orderType === "market" ? buyPrice : customPrice;
-    if(customPrice!== 0) buyPrice = customPrice;
-    else buyPrice = price;
-    console.log("Mera buyPrice hai abhi : ",buyPrice);
-    const data = await buyStock(symbol,buyPrice,quantity);
-    setActiveStock(null);    
-  }
-
-  const sellHandler = async (symbol) =>{
-    setSellStockState(symbol);
-  }
-
-  const sellFormHandler = async (e,symbol,price) =>{
-    e.preventDefault();
-    let sellPrice ;
-    if(customPrice!== 0 ) sellPrice = customPrice;
-    else sellPrice = price;
-
-    const data = await sellStock(symbol, sellPrice , quantity);
-    setSellStockState(null);
-  }
+    const {order, sellStock , buyStock , stock , quantity , setQuantity} = useStock();
+        const [activeStock,setActiveStock] = useState(null);
+        const [sellStockState,setSellStockState] = useState(null);
+        const [orderType,setOrderType] = useState("market");
+        const [customPrice,setCustomPrice] = useState(0);
+        const buyHandler = async (symbol,price)=>{
+            setActiveStock(symbol); 
+        }
+        
+        const buyFormHandler = async (e,symbol,price) =>{
+            e.preventDefault();
+            let buyPrice;
+            console.log("Mera Frontend par price hai : ",price);
+            console.log("My custom price is: ",customPrice);
+            // buyPrice = orderType === "market" ? buyPrice : customPrice;
+            if(customPrice!== 0) buyPrice = customPrice;
+            else buyPrice = price;
+            console.log("Mera buyPrice hai abhi : ",buyPrice);
+            const data = await buyStock(symbol,buyPrice,quantity);
+            setActiveStock(null);    
+        }
+        
+        const sellHandler = async (symbol) =>{
+            setSellStockState(symbol);
+        }
+        
+        const sellFormHandler = async (e,symbol,price) =>{
+            e.preventDefault();
+            let sellPrice ;
+            if(customPrice!== 0 ) sellPrice = customPrice;
+            else sellPrice = price;
+        
+            const data = await sellStock(symbol, sellPrice , quantity);
+            setSellStockState(null);
+        }
   return (
-    // <div>
+    <div>
+    <h3>Orders</h3>
 
-    //   <h3>Your Watchlist</h3>
-    //   {Array.isArray(stock) && stock.map((symbol) => 
-
-    //     <div
-    //       key={symbol}
-    //       onClick={() => onSelectStock(symbol)}
-    //       style={{cursor:"pointer"}}
-    //     >
-    //       {symbol}
-    //     </div>
-
-    //   ))}
-
-    // </div>
-//     <div>
-//     <h3>Your Watchlist</h3>
-
-//     {watchlist.map(symbol => {
-
-//       const priceData = stock.find(s => s.symbol === symbol);
-
-//       return (
-//         <div key={symbol}>
-//           {symbol} : {priceData ? `₹${priceData.price}` : "Loading..."}
-//         </div>
-//       );
-
-//     })}
-
-//   </div>
-
-     <div>
-    <h3>Your Watchlist</h3>
-
-    {watchlist.map(symbol => {
+    {order.map(symbol => {
 
       // const priceData = stock.find(s => s.symbol === symbol);
       const priceData = stock.find(s => s && s.symbol && s.symbol.toUpperCase() === symbol.toUpperCase());
@@ -160,14 +116,14 @@ const Watchlist = ({ onSelectStock }) => {
               <button type='submit'>Sell</button>
             </form>
           )}
-          <button onClick={()=> removeHandler(symbol)}>Remove</button>
         </div>
 
       );
 
     })}
   </div>
+    
   )
 }
 
-export default Watchlist
+export default OrderList

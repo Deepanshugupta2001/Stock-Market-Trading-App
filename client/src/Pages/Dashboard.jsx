@@ -22,7 +22,9 @@ const Dashboard = () => {
     <div>
         Welcome to Dashboard
         <button onClick={()=>navigate('/profile')}>Profile</button>
+        <button onClick={()=>navigate('/portfolio')}>Portfolio</button>
         <button id='logout' onClick={()=> logout()}>Logout</button>
+        <button onClick={()=>navigate('/wallet')}>Wallet</button>
 
       <SearchStock/>
       <StockDetails symbol={selectedStock} />

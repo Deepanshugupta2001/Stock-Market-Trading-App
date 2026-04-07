@@ -37,13 +37,13 @@ const stockSchema = new mongoose.Schema({
   watchlist: {
       type: [String],
       default: []
-    },
-    wallet:{
+  },
+  wallet:{
       type: Number,
       default : 0,
       min: 0,
-    },
-    transactions:[{
+  },
+  transactions:[{
       type:{
         type: String,
         enum : ["Deposit", "Withdrawal"],
@@ -68,7 +68,50 @@ const stockSchema = new mongoose.Schema({
         default : Date.now,
         required : true,
       }
-    }]
+ }],
+ holding:[{
+    // type:{
+    //   type:String,
+    //   required : true,
+    //   enum :["Buy","Sell"]
+    // },
+    // purprice:{
+    //   type: Number,
+    //   required : true
+    // },
+    average:{
+      type :Number
+    },
+    sellprice :{
+      type: Number,
+      // required : true
+    },
+    quantity : {
+      type : Number,
+      required : true
+    },
+    amountinvested : {
+      type :Number,
+      required : true
+    },
+    price : {
+      type : Number,
+      required : true,
+    },
+    change : {
+      type: Number,
+      // required : true
+    },
+    stock : {
+      type: String,
+      required : true,
+    },
+
+ }],
+ orderlist:{
+  type: [String],
+  default :[]
+ },
 }, { 
   timestamps: true  // Optional: createdAt/updatedAt
 });

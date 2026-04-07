@@ -18,24 +18,26 @@ export function startsocket(httpServer){
 
     console.log("Client connected:", socket.id);
 
-    socket.on("subscribe", (watchlist) => {
+    socket.on("subscribe", (symbols) => {
 
-      console.log("User subscribed:", watchlist);
+      console.log("User subscribed:", symbols);
 
-      userSubscriptions.set(socket.id, watchlist);
+      userSubscriptions.set(socket.id, symbols);
 
-      watchlist.forEach(symbol => {
+      // rebuildActiveSymbols();
+
+      symbols.forEach(symbol => { 
         if (symbol) activeSymbols.add(symbol);
       });
 
-      const prices = getPrices(watchlist);
+      const prices = getPrices(symbols);
 
   if (prices.length > 0) {
     socket.emit("prices", prices);
     console.log("Sent instant prices:", prices);
   } else {
     // console.log("No cached prices yet");
-    socket.emit("prices", watchlist.map(s => ({
+    socket.emit("prices", symbols.map(s => ({
     symbol: s,
     price: null
   })))
@@ -95,16 +97,16 @@ setInterval(async () => {
 
   io.sockets.sockets.forEach((socket) => {
 
-    const watchlist = userSubscriptions.get(socket.id);
+    const userSymbols = userSubscriptions.get(socket.id);
 
-    if (!watchlist) return;
+    if (!userSymbols) return;
 
-    const prices = getPrices(watchlist);
+    const prices = getPrices(userSymbols);
 
     if (prices.length > 0) {
       socket.emit("prices", prices);
     } else {
-      socket.emit("prices", watchlist.map(s => ({
+      socket.emit("prices", userSymbols.map(s => ({
         symbol: s,
         price: null
       })));
@@ -119,9 +121,9 @@ function rebuildActiveSymbols() {
 
   activeSymbols.clear();
 
-  userSubscriptions.forEach((watchlist) => {
+  userSubscriptions.forEach((symbols) => {
 
-    watchlist.forEach(symbol => {
+    symbols.forEach(symbol => {
       if (symbol) activeSymbols.add(symbol);
     });
 
