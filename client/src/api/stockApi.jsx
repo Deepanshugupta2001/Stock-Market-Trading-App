@@ -152,13 +152,14 @@ async function showCharts(symbol,range) {
   
 }
 
-async function buyStocK(symbol,price,quantity) {
+async function buyStocK(symbol,price,quantity,orderType) {
   const token = localStorage.getItem("token");
   const response = await axios.post(`/api/stock/portfolio/buy`,
     {
       symbol,
       price,
       quantity,
+      orderType,
     },
     {
         headers: { Authorization: `Bearer ${token}` }
@@ -168,12 +169,13 @@ async function buyStocK(symbol,price,quantity) {
   return response.data.data;
 }
 
-async function sellStocK(symbol,price,quantity) {
+async function sellStocK(symbol,price,quantity,orderType) {
   const token = localStorage.getItem("token");
   const response = await axios.post(`/api/stock/portfolio/sell`,{
     symbol,
     price,
-    quantity
+    quantity,
+    orderType,
   },
   {
         headers: { Authorization: `Bearer ${token}` }

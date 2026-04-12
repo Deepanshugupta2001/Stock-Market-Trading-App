@@ -11,6 +11,7 @@ import env from './env.js';
 import mongoose from 'mongoose';
 import { startsocket } from './socket/index.js';
 import stockRoutes from './http/routes/stock.routes.js';
+import { buyOrderExecuting, sellOrderExecuting } from './jobs/orderExecution.js';
 const PORT = env.PORT || 4444 ;
 const app = express();
 const httpServer = createServer(app);
@@ -34,5 +35,9 @@ mongoose.connect('mongodb://localhost:27017/stocks')
     .then(()=>{
         httpServer.listen(PORT,()=>{
             console.log(`http://localhost:`+PORT);
+
+            buyOrderExecuting();
+
+            sellOrderExecuting();
         })
     })

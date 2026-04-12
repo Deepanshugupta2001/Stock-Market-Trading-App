@@ -197,8 +197,10 @@ export async function postBuyStock(req,res,next) {
         const {symbol} = req.body;
         const price = req.body.price;
         const {quantity} = req.body;
+        const {orderType} = req.body;
+        console.log("Mera orderType aa raha hai from Frontend ",orderType);
 
-        const data = await buyStock(symbol,price,quantity,userId);
+        const data = await buyStock(symbol,price,quantity,userId,orderType);
         res.status(200).json({
             data
         })
@@ -217,9 +219,10 @@ export async function postSellStock(req,res,next) {
         const {symbol} = req.body;
         const {price} = req.body;
         const {quantity} = req.body;
+        const {orderType} = req.body;
         console.log("Ma controller ma aa gaya hu sell ka");
         console.log("Ab mera symbol , price , quantity are :",symbol , price , quantity);
-        const data = await sellStock(userId,symbol,price,quantity);
+        const data = await sellStock(userId,symbol,price,quantity,orderType);
         res.status(200).json({
             data
         })

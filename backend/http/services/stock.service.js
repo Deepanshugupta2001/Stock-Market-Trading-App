@@ -30,7 +30,8 @@ export async function stockData(symbol , retries = 3) {
             symbol: q.symbol,
             price: q.regularMarketPrice,
             change: q.regularMarketChange,
-            percent: q.regularMarketChangePercent
+            percent: q.regularMarketChangePercent,
+            marketState : q.marketState,
         }));
         }
 
@@ -39,6 +40,7 @@ export async function stockData(symbol , retries = 3) {
             price : response.regularMarketPrice,
             change : response.regularMarketChange,
             percent : response.regularMarketChangePercent,
+            marketState : response.marketState,
         }]
         // console.log(response);
         // return quotes.map(q => ({
@@ -336,57 +338,189 @@ export async function getStockChart(symbol, range) {
   }
 }
 
-export async function buyStock(symbol,price,quantity,userId) {
+export async function buyStock(symbol, price, quantity, userId, orderType) {
+
     const user = await Stock.findById(userId);
+    if (!user) throw new Error("User not found");
 
-    if(!user) throw new Error("User not Found");
+    if (!symbol || !price || !quantity) {
+        throw new Error("Invalid order details");
+    }
 
-    const curprice = await stockData(symbol);
-    console.log(curprice);
-    const Price = curprice[0].price; 
-    console.log(Price);
-
-    console.log("User id is :",userId);
-    console.log("Symbol is :",symbol);
-    console.log("Price is :",price);
-    console.log("Quantity is :",quantity);
-    let totalamount = price*quantity ;
-    
-    if(user.wallet < totalamount) throw new Error("Insufficient Balance in your wallet");
-
-    user.wallet -= totalamount ;
-
-    const existingStock = user.holding.find(
-        (item)=>item.stock === symbol
+    // NSE market close (3:30 PM IST)
+    const now = new Date();
+    const validTill = new Date(
+        now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
     );
+    validTill.setHours(15, 30, 0, 0);
 
-    if(existingStock){
-        console.log("Stock mil gaya hai ");
-        let curr_quantity = user.holding.quantity + quantity;
-        let curr_av = (user.holding.average*user.holding.quantity + price*quantity)/(quantity + user.holding.quantity);
-        let curr_amountinvested = user.holding.amountinvested + (price*quantity);
-        
-        existingStock.quantity = curr_quantity;
-        existingStock.average = curr_av;
-        existingStock.amountinvested = curr_amountinvested ;
-    }
-    else{
-        console.log("Stock nahi mila hai ");
-        user.holding.push({
-            quantity : quantity,
-            stock : symbol,
-            average : price,
-            amountinvested : totalamount,
-            price: price,
-    })    
-    console.log("Maine stock ka liye changes kar liya hai db ma ");
-    }
+    const order = {
+        stock: symbol,
+        price: price,
+        quantity: quantity,
+        orderType: orderType, // "market" or "limit"
+        orderStatus: "Open",
+        placedAt: Date.now(),
+        validTill: validTill
+    };
+
+    user.orderDetails.push(order);
 
     await user.save();
-    return user.holding;
+
+    return {
+        message: "Order placed successfully. Waiting for execution.",
+        order
+    };
 }
 
-export async function sellStock(userId, symbol,price,quantity) {
+// async function customBuyOrder(){
+
+// }
+
+// export async function buyStock(symbol,price,quantity,userId,orderType) {
+//     const user = await Stock.findById(userId);
+
+//     if(!user) throw new Error("User not Found");
+
+//     console.log("Mera orderType aa raha hai from controller ",orderType);
+//     const order ={
+//         stock : symbol,
+//         price : price,
+//         placedAt : Date.now(),
+//         orderType : orderType,
+//         quantity : quantity,
+//         orderStatus : "Open"
+//     };
+//     user.orderDetails.push(order);
+//     await user.save();
+
+//     console.log("User details are as follows:")
+//     console.log("Stock is :",user.orderDetails.stock);
+//     console.log("Price is :",user.orderDetails.price);
+//     console.log("Order placed at: ",user.orderDetails.placedAt);
+//     console.log("Order Type is :",user.orderDetails.orderType);
+//     console.log("Order quantity is :",user.orderDetails.quantity);
+//     console.log("Order status is :",user.orderDetails.orderStatus);
+
+//     const curprice = await stockData(symbol);
+//     console.log("Curprice is :",curprice);
+//     // const Price = curprice[0].price; 
+//     const marketState = curprice[0].marketState;
+//     // console.log(Price);
+
+//     console.log("User id is :",userId);
+//     console.log("Symbol is :",symbol);
+//     console.log("Price is :",price);
+//     console.log("Quantity is :",quantity);
+//     let totalamount = price*quantity ;
+    
+//     if(user.wallet < totalamount) throw new Error("Insufficient Balance in your wallet");
+
+//     user.wallet -= totalamount ;
+
+//     const existingStock = user.holding.find(
+//         (item)=>item.stock === symbol
+//     );
+//     if(orderType == 'limit'){
+//         if(marketState == 'REGULAR'){
+
+
+//             // await curprice == price;
+//              if(existingStock){
+//                 console.log("Stock mil gaya hai ");
+//                 // let curr_quantity = user.holding.quantity + quantity;
+//                 // let curr_av = (user.holding.average*user.holding.quantity + price*quantity)/(quantity + user.holding.quantity);
+//                 // let curr_amountinvested = user.holding.amountinvested + (price*quantity);
+//                 let curr_quantity = existingStock.quantity + quantity;
+//                 let curr_av = (existingStock.average*existingStock.quantity + price*quantity)/(quantity + existingStock.quantity);
+//                 let curr_amountinvested = existingStock.amountinvested + (price*quantity);
+
+//                 existingStock.quantity = curr_quantity;
+//                 existingStock.average = curr_av;
+//                 existingStock.amountinvested = curr_amountinvested ;
+
+//                 // We will do order work later
+//                 await user.save();
+//             }
+//             else{
+//                 console.log("Stock nahi mila hai ");
+//                 user.holding.push({
+//                     quantity : quantity,
+//                     stock : symbol,
+//                     average : price,
+//                     amountinvested : totalamount,
+//                     price: price,
+//             }) 
+//                 // We will do order work later
+//             await user.save();
+            
+//             console.log("Maine stock ka liye changes kar liya hai db ma ");
+//             }
+//         }
+//         else{
+//             throw new Error("Cannot execute order as the market is closed");
+//         }
+//     }
+//     else {
+//         if(marketState == 'REGULAR'){
+//     if(existingStock){
+//         console.log("Stock mil gaya hai ");
+//         // let curr_quantity = user.holding.quantity + quantity;
+//         // let curr_av = (user.holding.average*user.holding.quantity + price*quantity)/(quantity + user.holding.quantity);
+//         // let curr_amountinvested = user.holding.amountinvested + (price*quantity);
+//          let curr_quantity = existingStock.quantity + quantity;
+//         let curr_av = (existingStock.average*existingStock.quantity + price*quantity)/(quantity + existingStock.quantity);
+//         let curr_amountinvested = existingStock.amountinvested + (price*quantity);
+
+//         existingStock.quantity = curr_quantity;
+//         existingStock.average = curr_av;
+//         existingStock.amountinvested = curr_amountinvested ;
+        
+//         const lastOrder = user.orderDetails[user.orderDetails.length -1];
+//         lastOrder.orderStatus = "Completed";
+//         await user.save();
+
+//             console.log("User details are as follows :")
+//     console.log("Stock is :",user.orderDetails.stock);
+//     console.log("Price is :",user.orderDetails.price);
+//     console.log("Order placed at: ",user.orderDetails.placedAt);
+//     console.log("Order Type is :",user.orderDetails.orderType);
+//     console.log("Order quantity is :",user.orderDetails.quantity);
+//     console.log("Order status is :",user.orderDetails.orderStatus);
+//     }
+//     else{
+//         console.log("Stock nahi mila hai ");
+//         user.holding.push({
+//             quantity : quantity,
+//             stock : symbol,
+//             average : price,
+//             amountinvested : totalamount,
+//             price: price,
+//     }) 
+    
+//     const lastOrder = user.orderDetails[user.orderDetails.length -1];
+//         lastOrder.orderStatus = "Completed";
+//         await user.save();
+//         console.log("User details are as follows:")
+//     console.log("Stock is :",user.orderDetails.stock);
+//     console.log("Price is :",user.orderDetails.price);
+//     console.log("Order placed at: ",user.orderDetails.placedAt);
+//     console.log("Order Type is :",user.orderDetails.orderType);
+//     console.log("Order quantity is :",user.orderDetails.quantity);
+//     console.log("Order status is :",user.orderDetails.orderStatus);
+//     console.log("Maine stock ka liye changes kar liya hai db ma ");
+//     }
+// }
+//     else{
+//             throw new Error("Cannot execute order as the market is closed");
+//     }
+// }
+//     await user.save();
+//     return user.holding;
+// }
+
+export async function sellStock(userId, symbol,price,quantity,orderType) {
     const user = await Stock.findById(userId);
 
     console.log("Ma service file of sell ma aa gaya hu");

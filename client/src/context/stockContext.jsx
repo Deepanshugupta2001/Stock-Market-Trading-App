@@ -117,13 +117,13 @@ export const StockProvider = ({children}) =>{
         return data ;
     }
 
-    async function buyStock(symbol,price,quantity) {
-        const data = await stockApi.buyStocK(symbol,price,quantity);
+    async function buyStock(symbol,price,quantity,orderType) {
+        const data = await stockApi.buyStocK(symbol,price,quantity, orderType);
         return data ;
     }
 
-    async function sellStock(symbol,price,quantity) {
-        const data =await stockApi.sellStocK(symbol,price,quantity);
+    async function sellStock(symbol,price,quantity,orderType) {
+        const data =await stockApi.sellStocK(symbol,price,quantity,orderType);
         return data;
     }
     return (

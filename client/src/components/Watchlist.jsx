@@ -29,10 +29,20 @@ const Watchlist = ({ onSelectStock }) => {
     console.log("Mera Frontend par price hai : ",price);
     console.log("My custom price is: ",customPrice);
     // buyPrice = orderType === "market" ? buyPrice : customPrice;
-    if(customPrice!== 0) buyPrice = customPrice;
-    else buyPrice = price;
+    if(customPrice!== 0) {
+      buyPrice = customPrice;
+      // orderType = 'limit';
+      setOrderType('limit');
+    }
+
+    else {
+      buyPrice = price;
+      // orderType = 'market';
+      setOrderType('market');
+    }
+    console.log("Mera orderType is :",orderType);
     console.log("Mera buyPrice hai abhi : ",buyPrice);
-    const data = await buyStock(symbol,buyPrice,quantity);
+    const data = await buyStock(symbol,buyPrice,quantity,orderType);
     setActiveStock(null);    
   }
 
@@ -43,10 +53,16 @@ const Watchlist = ({ onSelectStock }) => {
   const sellFormHandler = async (e,symbol,price) =>{
     e.preventDefault();
     let sellPrice ;
-    if(customPrice!== 0 ) sellPrice = customPrice;
-    else sellPrice = price;
+    if(customPrice!== 0 ) {
+      sellPrice = customPrice;
+      orderType = 'limit';
+    }
+    else {
+      sellPrice = price;
+      orderType = 'market';
+    }
 
-    const data = await sellStock(symbol, sellPrice , quantity);
+    const data = await sellStock(symbol, sellPrice , quantity , orderType);
     setSellStockState(null);
   }
   return (

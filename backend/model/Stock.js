@@ -92,7 +92,6 @@ const stockSchema = new mongoose.Schema({
     },
     amountinvested : {
       type :Number,
-      required : true
     },
     price : {
       type : Number,
@@ -112,6 +111,69 @@ const stockSchema = new mongoose.Schema({
   type: [String],
   default :[]
  },
+ orderDetails : [{
+  stock : {
+    type : String,
+    required : true,
+  },
+  price : {
+    type : Number,
+    required : true,
+  },
+  placedAt:{
+    type : Date,
+    default : Date.now(),
+  },
+  orderType : {
+    type : String,
+    required : true,
+  },
+  quantity : {
+    type : Number,
+    required : true,
+  },
+  orderStatus : {
+    type : String,
+    required : true,
+    enum : ["Open","Completed","Expired","Cancelled"],
+  },
+  executedAt : {
+    type : Date,
+  },
+  validTill : {
+    type : Date,
+    // required : true,
+  }
+ }],
+ holdingTransactions :[{
+  stock :{
+    type: String ,
+    required : true ,
+  },
+  orderType : {
+    type : String,
+    required : true,
+    enum : ["Buy","Sell"],
+    default : "Buy",
+  },
+  quantity : {
+    type : Number,
+    required : true,
+  },
+  price :{
+    type : Number,
+    required : true,
+  },
+  executedAt :{
+    type : Date,
+    required: true,
+    default : Date.now,
+  },
+  average: {
+    type: Number,
+    required : true,
+  },
+ }],
 }, { 
   timestamps: true  // Optional: createdAt/updatedAt
 });
