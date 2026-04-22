@@ -338,7 +338,44 @@ export async function getStockChart(symbol, range) {
   }
 }
 
-export async function buyStock(symbol, price, quantity, userId, orderType) {
+export async function buyStock(symbol, price, quantity, userId, orderType,purpose,validTill) {
+
+    const user = await Stock.findById(userId);
+    if (!user) throw new Error("User not found");
+
+    if (!symbol || !price || !quantity) {
+        throw new Error("Invalid order details");
+    }
+    console.log("The details of the stock are :", symbol,price,quantity,userId,orderType,purpose,validTill);
+    // NSE market close (3:30 PM IST)
+    // const now = new Date();
+    // const validTill = new Date(
+    //     now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    // );
+    // validTill.setHours(15, 30, 0, 0);
+
+    const order = {
+        stock: symbol,
+        price: price,
+        quantity: quantity,
+        orderType: orderType, // "market" or "limit"
+        orderStatus: "Open",
+        placedAt: Date.now(),
+        validTill: validTill,
+        purpose : purpose,
+    };
+
+    user.orderDetails.push(order);
+
+    await user.save();
+
+    return {
+        message: "Order placed successfully. Waiting for execution.",
+        order
+    };
+}
+
+export async function sellStock(userId,symbol,price,quantity,orderType,purpose,validTill) {
 
     const user = await Stock.findById(userId);
     if (!user) throw new Error("User not found");
@@ -349,10 +386,10 @@ export async function buyStock(symbol, price, quantity, userId, orderType) {
 
     // NSE market close (3:30 PM IST)
     const now = new Date();
-    const validTill = new Date(
-        now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    );
-    validTill.setHours(15, 30, 0, 0);
+    // const validTill = new Date(
+    //     now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    // );
+    // validTill.setHours(15, 30, 0, 0);
 
     const order = {
         stock: symbol,
@@ -361,7 +398,10 @@ export async function buyStock(symbol, price, quantity, userId, orderType) {
         orderType: orderType, // "market" or "limit"
         orderStatus: "Open",
         placedAt: Date.now(),
-        validTill: validTill
+        validTill: validTill,
+        // purpose : "Sell",
+        purpose : purpose,
+
     };
 
     user.orderDetails.push(order);
@@ -520,39 +560,39 @@ export async function buyStock(symbol, price, quantity, userId, orderType) {
 //     return user.holding;
 // }
 
-export async function sellStock(userId, symbol,price,quantity,orderType) {
-    const user = await Stock.findById(userId);
+// export async function sellStock(userId, symbol,price,quantity,orderType, purpose) {
+//     const user = await Stock.findById(userId);
 
-    console.log("Ma service file of sell ma aa gaya hu");
-    console.log("Mera joh data hai of symbol,price and quantity are :",symbol, price ,quantity);
-    const existingStock = user.holding.find(
-        (item)=> item.stock === symbol
-    );
+//     console.log("Ma service file of sell ma aa gaya hu");
+//     console.log("Mera joh data hai of symbol,price and quantity are :",symbol, price ,quantity);
+//     const existingStock = user.holding.find(
+//         (item)=> item.stock === symbol
+//     );
 
-    if(existingStock){
-        console.log("Ma existingStock ka if ka andar aa gaya hu ");
-        if(quantity > existingStock.quantity) throw new Error("Cannot Sell as you are selling beyond your holdings");
+//     if(existingStock){
+//         console.log("Ma existingStock ka if ka andar aa gaya hu ");
+//         if(quantity > existingStock.quantity) throw new Error("Cannot Sell as you are selling beyond your holdings");
 
-        else {
-            let curr_quantity = existingStock.quantity - quantity;
-            let curr_av = (curr_quantity)*price;
-            let curr_amountinvested = curr_av * curr_quantity;
+//         else {
+//             let curr_quantity = existingStock.quantity - quantity;
+//             let curr_av = (curr_quantity)*price;
+//             let curr_amountinvested = curr_av * curr_quantity;
 
-            console.log("Current quantity , average and amount invested is :",curr_quantity,curr_av,curr_amountinvested);
+//             console.log("Current quantity , average and amount invested is :",curr_quantity,curr_av,curr_amountinvested);
 
-            existingStock.average = curr_av;
-            existingStock.quantity = curr_quantity;
-            existingStock.amountinvested = curr_amountinvested;
-            user.wallet+= (quantity*price);
-        }
+//             existingStock.average = curr_av;
+//             existingStock.quantity = curr_quantity;
+//             existingStock.amountinvested = curr_amountinvested;
+//             user.wallet+= (quantity*price);
+//         }
 
-        await user.save();
-        return user.holding;
-    }
-    else{
-        throw new Error("Cannot Sell as You do not have this Stock In Your Holding");
-    }
-}
+//         await user.save();
+//         return user.holding;
+//     }
+//     else{
+//         throw new Error("Cannot Sell as You do not have this Stock In Your Holding");
+//     }
+// }
 
 export async function getOrderList(userId) {
     const user = await Stock.findById(userId);
@@ -572,4 +612,19 @@ export async function addStockOrderList(userId,symbol){
     )
 
     return true;
+}
+
+export async function geTOrderDetails(userId){
+    const user =await Stock.findById(userId);
+    if(!user) throw new Error("User not found");
+
+    return user.orderDetails;
+}
+
+export async function getHolding(userId) {
+    const user = await Stock.findById(userId);
+
+    if(!user) throw new Error("User not found");
+
+    return user.holding;
 }

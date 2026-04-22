@@ -152,7 +152,7 @@ async function showCharts(symbol,range) {
   
 }
 
-async function buyStocK(symbol,price,quantity,orderType) {
+async function buyStocK(symbol,price,quantity,orderType,purpose,validTill) {
   const token = localStorage.getItem("token");
   const response = await axios.post(`/api/stock/portfolio/buy`,
     {
@@ -160,6 +160,8 @@ async function buyStocK(symbol,price,quantity,orderType) {
       price,
       quantity,
       orderType,
+      purpose,
+      validTill,
     },
     {
         headers: { Authorization: `Bearer ${token}` }
@@ -169,18 +171,38 @@ async function buyStocK(symbol,price,quantity,orderType) {
   return response.data.data;
 }
 
-async function sellStocK(symbol,price,quantity,orderType) {
+async function sellStocK(symbol,price,quantity,orderType,purpose,validTill) {
   const token = localStorage.getItem("token");
   const response = await axios.post(`/api/stock/portfolio/sell`,{
     symbol,
     price,
     quantity,
     orderType,
+    purpose,
+    validTill
   },
   {
         headers: { Authorization: `Bearer ${token}` }
     }
 );
+  return response.data.data;
+}
+
+async function getOrderDetails() {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`/api/stock/orderDetails`,{
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  return response.data.data;
+}
+
+async function getHoldings() {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`/api/stock/holding`,{
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
   return response.data.data;
 }
 
@@ -199,4 +221,6 @@ export const stockApi ={
     sellStocK,
     addOrderList,
     getOrderList,
+    getOrderDetails,
+    getHoldings,
 }

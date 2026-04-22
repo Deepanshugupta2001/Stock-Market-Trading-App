@@ -12,15 +12,29 @@ const Watchlist = ({ onSelectStock }) => {
   const [sellStockState,setSellStockState] = useState(null);
   const [orderType,setOrderType] = useState("market");
   const [customPrice,setCustomPrice] = useState(0);
+  const [purpose,setPurpose] = useState("Buy");
+  const [mode,setMode] = useState("normal");
+  
   const removeHandler = async (symbol)=>{
     const data = await removeStock(symbol);
   }
+  
+  const getValidTill = (mode) =>{
+          const now = new Date();
 
+          if(mode === "GTT" ) now.setDate(now.getDate() + 30);
+
+          else now.setDate(now.getDate() + 1);
+
+          return now ;
+  }
   // const showCharts = async (symbol)=>{
   //   const data = await showChart(symbol);
   // }
-  const buyHandler = async (symbol,price)=>{
+  const buyHandler = async (symbol,type="normal")=>{
     setActiveStock(symbol); 
+    setMode(type);
+
   }
 
   const buyFormHandler = async (e,symbol,price) =>{
@@ -28,6 +42,7 @@ const Watchlist = ({ onSelectStock }) => {
     let buyPrice;
     console.log("Mera Frontend par price hai : ",price);
     console.log("My custom price is: ",customPrice);
+    setPurpose("Buy");
     // buyPrice = orderType === "market" ? buyPrice : customPrice;
     if(customPrice!== 0) {
       buyPrice = customPrice;
@@ -40,13 +55,18 @@ const Watchlist = ({ onSelectStock }) => {
       // orderType = 'market';
       setOrderType('market');
     }
+    const validTill = getValidTill(mode);
+
     console.log("Mera orderType is :",orderType);
     console.log("Mera buyPrice hai abhi : ",buyPrice);
-    const data = await buyStock(symbol,buyPrice,quantity,orderType);
-    setActiveStock(null);    
+    const data = await buyStock(symbol,buyPrice,quantity,orderType,purpose);
+    setActiveStock(null); 
+    setQuantity(0);
+    setCustomPrice(0);
+    setOrderType("market");
   }
 
-  const sellHandler = async (symbol) =>{
+  const sellHandler = async (symbol,type="normal") =>{
     setSellStockState(symbol);
   }
 
@@ -55,15 +75,22 @@ const Watchlist = ({ onSelectStock }) => {
     let sellPrice ;
     if(customPrice!== 0 ) {
       sellPrice = customPrice;
-      orderType = 'limit';
+      // orderType = 'limit';
+      setOrderType('limit');
     }
     else {
       sellPrice = price;
-      orderType = 'market';
+      // orderType = 'market';
+      setOrderType('market');
     }
+    const validTill = getValidTill(mode);
 
-    const data = await sellStock(symbol, sellPrice , quantity , orderType);
+    setPurpose("Sell");
+    const data = await sellStock(symbol, sellPrice , quantity , orderType,purpose);
     setSellStockState(null);
+    setQuantity(0);
+    setCustomPrice(0);
+    setOrderType("market");
   }
   return (
     // <div>
@@ -132,9 +159,11 @@ const Watchlist = ({ onSelectStock }) => {
             onSelectStock(symbol);
           }}>Show Chart</button>
 
-          <button onClick={()=>buyHandler(symbol,priceData?.price)}>Buy</button>
+          <button onClick={()=>buyHandler(symbol,"normal")}>Buy</button>
+          <button onClick={()=>buyHandler(symbol,"GTT")}>Buy GTT</button>
           {activeStock === symbol && ( 
             <form onSubmit={(e)=> buyFormHandler(e,symbol,priceData?.price)}>
+              <p>{mode == "GTT" ? "GTT Order " : "Normal Order"}</p>
               <p>Quantity :</p>
               <input onChange={(e)=>setQuantity(e.target.value)} type="number" value={quantity} placeholder='Enter your quantity to purchase'></input>
               <div>
@@ -156,8 +185,10 @@ const Watchlist = ({ onSelectStock }) => {
 
 
           <button onClick={()=>sellHandler(symbol)}>Sell</button>
+          <button onClick={()=>sellHandler(symbol,"GTT")}>Sell GTT</button>
           {sellStockState === symbol && ( 
             <form onSubmit={(e)=> sellFormHandler(e,symbol,priceData?.price)}>
+              <p>{mode == "GTT" ? "GTT Order " : "Normal Order"}</p>
               <p>Quantity :</p>
               <input onChange={(e)=>setQuantity(e.target.value)} type="number" value={quantity} placeholder='Enter your quantity to sell'></input>
               <div>
@@ -170,7 +201,7 @@ const Watchlist = ({ onSelectStock }) => {
               )}
 
               {orderType === "market" && priceData && (
-                <p>Buying at market price: Rs. {priceData.price}</p>
+                <p>Selling at market price: Rs. {priceData.price}</p>
               )}
 
               <button type='submit'>Sell</button>

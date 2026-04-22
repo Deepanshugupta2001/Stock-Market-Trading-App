@@ -11,6 +11,7 @@ const socket = io("http://localhost:4444");
 
 export const StockProvider = ({children}) =>{
     const [stock,setStock] = useState([]);
+    const [orderDetails,setOrderDetails] = useState([]);
     const [watchlist,setWatchlist] = useState([]);
     const [wal,setWal] = useState(0);
     const [transaction,setTransaction] = useState([]);
@@ -18,6 +19,7 @@ export const StockProvider = ({children}) =>{
     const [quantity , setQuantity] = useState(0);
     const [price,setPrice] = useState(0);
     const [order,setOrder] = useState([]);
+    const [holding,setHolding] = useState([]);
     
     async function loadWatchlist() {
         const data = await stockApi.getWatchlist();
@@ -89,6 +91,8 @@ export const StockProvider = ({children}) =>{
         loadWatchlist();
         loadWallet();
         loadOrderList();
+        getOrderDetails();
+        getHolding();
     },[]);
 
     useEffect(()=>{
@@ -117,14 +121,28 @@ export const StockProvider = ({children}) =>{
         return data ;
     }
 
-    async function buyStock(symbol,price,quantity,orderType) {
-        const data = await stockApi.buyStocK(symbol,price,quantity, orderType);
+    async function buyStock(symbol,price,quantity,orderType,purpose,validTill) {
+        const data = await stockApi.buyStocK(symbol,price,quantity, orderType,purpose,validTill);
+        getOrderDetails();
+        getHolding();
         return data ;
     }
 
-    async function sellStock(symbol,price,quantity,orderType) {
-        const data =await stockApi.sellStocK(symbol,price,quantity,orderType);
+    async function sellStock(symbol,price,quantity,orderType,purpose,validTill) {
+        const data =await stockApi.sellStocK(symbol,price,quantity,orderType,purpose,validTill);
+        getOrderDetails();
+        getHolding();
         return data;
+    }
+
+    async function getOrderDetails(){
+        const data = await stockApi.getOrderDetails();
+        setOrderDetails(data);
+    }
+    
+    async function getHolding() {
+        const data = await stockApi.getHoldings();
+        setHolding(data);
     }
     return (
         <stockcontext.Provider value={{
@@ -153,6 +171,9 @@ export const StockProvider = ({children}) =>{
             order,
             addStockOrderList,
             loadOrderList,
+            orderDetails,
+            getOrderDetails,
+            holding,
         }}>
             {children}
         </stockcontext.Provider>

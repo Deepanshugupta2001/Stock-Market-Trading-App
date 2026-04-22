@@ -1,5 +1,5 @@
 import Stock from "../../model/Stock.js";
-import { addmoney, addStockOrderList, addWatchlist, buyStock, getOrderList, getStockChart, loadWallet, removeWatchlist, searchStock, sellStock, stockData, transactions, watchlist, withdrawmoney } from "../services/stock.service.js";
+import { addmoney, addStockOrderList, addWatchlist, buyStock, getHolding, geTOrderDetails, getOrderList, getStockChart, loadWallet, removeWatchlist, searchStock, sellStock, stockData, transactions, watchlist, withdrawmoney } from "../services/stock.service.js";
 
 export async function postStockData(req,res,next) {
     try {
@@ -198,9 +198,11 @@ export async function postBuyStock(req,res,next) {
         const price = req.body.price;
         const {quantity} = req.body;
         const {orderType} = req.body;
+        const {purpose} = req.body;
+        const {validTill} = req.body;
         console.log("Mera orderType aa raha hai from Frontend ",orderType);
 
-        const data = await buyStock(symbol,price,quantity,userId,orderType);
+        const data = await buyStock(symbol,price,quantity,userId,orderType,purpose,validTill);
         res.status(200).json({
             data
         })
@@ -220,9 +222,11 @@ export async function postSellStock(req,res,next) {
         const {price} = req.body;
         const {quantity} = req.body;
         const {orderType} = req.body;
+        const {purpose} = req.body;
+        const {validTill} = req.body;
         console.log("Ma controller ma aa gaya hu sell ka");
-        console.log("Ab mera symbol , price , quantity are :",symbol , price , quantity);
-        const data = await sellStock(userId,symbol,price,quantity,orderType);
+        console.log("Ab mera symbol , price , quantity are :",symbol , price , quantity,orderType,purpose,validTill);
+        const data = await sellStock(userId,symbol,price,quantity,orderType,purpose,validTill);
         res.status(200).json({
             data
         })
@@ -266,5 +270,40 @@ export async function postAddStockOrderList(req,res,next) {
             message : "We are unable to add Stock to Order List right now",
             error : error.message,
         })
+    }
+}
+
+export async function postGetOrderDetails(req,res,next) {
+    const userId = req.user._id;
+
+    try{
+        const data = await geTOrderDetails(userId);
+        res.status(200).json({
+            data
+        })
+    }
+    catch(error){
+        console.log("We currently cannot get order details");
+        res.status(500).json({
+            message : "We are unable to get order details",
+            error : error.message,
+        })
+    }
+}
+
+export async function postGetHolding(req,res,next) {
+    const userId = req.user._id ;
+
+    try {
+        const data = await getHolding(userId);
+        res.status(200).json({
+            data
+        })
+    } catch (error) {
+        console.log("We currently cannot get holdings");
+        res.status(500).json({
+            message : "We are unable to get holding details",
+            error: error.message,
+        })     
     }
 }

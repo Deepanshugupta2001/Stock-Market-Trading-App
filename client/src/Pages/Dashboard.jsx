@@ -25,6 +25,7 @@ const Dashboard = () => {
         <button onClick={()=>navigate('/portfolio')}>Portfolio</button>
         <button id='logout' onClick={()=> logout()}>Logout</button>
         <button onClick={()=>navigate('/wallet')}>Wallet</button>
+        <button onClick={()=>navigate('/orders')}>Orders</button>
 
       <SearchStock/>
       <StockDetails symbol={selectedStock} />

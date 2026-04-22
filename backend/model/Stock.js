@@ -122,7 +122,7 @@ const stockSchema = new mongoose.Schema({
   },
   placedAt:{
     type : Date,
-    default : Date.now(),
+    default : Date.now,
   },
   orderType : {
     type : String,
@@ -143,6 +143,18 @@ const stockSchema = new mongoose.Schema({
   validTill : {
     type : Date,
     // required : true,
+  },
+  isProcessing :{
+    type : Boolean,
+    default : false,
+  },
+  triggeredAt :{
+    type: Number,
+    default : null,
+  },
+  purpose : {
+    type : String,
+    enum : ["Buy", "Sell"],
   }
  }],
  holdingTransactions :[{
@@ -177,5 +189,7 @@ const stockSchema = new mongoose.Schema({
 }, { 
   timestamps: true  // Optional: createdAt/updatedAt
 });
+
+stockSchema.index({ "orderDetails.orderStatus": 1 });
 
 export default mongoose.models.stocks || mongoose.model('stocks', stockSchema);
