@@ -3,12 +3,12 @@ import useStock from '../context/stockContext';
 
 const OrderList = ({onSelectStock}) => {
 
-    const {order, sellStock , buyStock , stock , quantity , setQuantity , orderDetails } = useStock();
+    const {order, sellStock , buyStock , stock , quantity , setQuantity , orderDetails , showChart } = useStock();
         const [activeStock,setActiveStock] = useState(null);
         const [sellStockState,setSellStockState] = useState(null);
         const [orderType,setOrderType] = useState("market");
         const [customPrice,setCustomPrice] = useState(0);
-        const [purpose,setPurpose] = useState("Buy");
+        // const [purpose,setPurpose] = useState("Buy");
         const [mode,setMode] = useState("normal");
 
         const getValidTill = (mode) =>{
@@ -31,7 +31,8 @@ const OrderList = ({onSelectStock}) => {
             let buyPrice;
             console.log("Mera Frontend par price hai : ",price);
             console.log("My custom price is: ",customPrice);
-            setPurpose("Buy");
+            const purpose = "Buy";
+            // setPurpose("Buy");
             // buyPrice = orderType === "market" ? buyPrice : customPrice;
             if(customPrice!== 0){
               buyPrice = customPrice;
@@ -68,7 +69,8 @@ const OrderList = ({onSelectStock}) => {
               setOrderType('market');
             }
             const validTill = getValidTill(mode);
-            setPurpose('Sell');
+            const purpose = "Sell";
+            // setPurpose('Sell');
             const data = await sellStock(symbol, sellPrice , quantity,orderType,purpose,validTill);
             setSellStockState(null);
             setQuantity(0);
@@ -83,7 +85,7 @@ const OrderList = ({onSelectStock}) => {
 
       // const priceData = stock.find(s => s.symbol === symbol);
       const priceData = stock.find(s => s && s.symbol && s.symbol.toUpperCase() === symbol.toUpperCase());
-
+      console.log("Order symbol :",symbol);
       return (
         // <div key={symbol}>
         //   {symbol} : {priceData?.price ?? "Loading..."}
@@ -181,8 +183,6 @@ const OrderList = ({onSelectStock}) => {
             </form>
           )}
         </div>
-        
-        
       );
 
     })}

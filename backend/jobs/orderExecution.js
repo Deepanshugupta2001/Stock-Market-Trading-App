@@ -25,10 +25,10 @@ export function buyOrderExecuting() {
         try {
             console.log(" Running Buy Order Executor...");
 
-            // if (!isIndianMarketOpen()) {
-            //     console.log(" Market Closed");
-            //     return;
-            // }
+            if (!isIndianMarketOpen()) {
+                console.log(" Market Closed");
+                return;
+            }
 
             const users = await Stock.find({
                 "orderDetails.orderStatus": "Open"
@@ -76,40 +76,50 @@ export function buyOrderExecuting() {
                         console.log(
                             `${order.stock} | CMP: ${currentPrice} | Target: ${order.price}`
                         );
-
+                        let shouldExecute = false;
                         //  LIMIT ORDER LOGIC (FIXED)
                         if (order.orderType === "limit") {
 
                             // Buy only if price is <= target
-                            if (currentPrice > order.price) {
-                                order.isProcessing = false;
-                                continue;
-                            }
-
-                            //  Prevent sudden spike execution (buffer zone)
-                            const tolerance = 0.002; // 0.2%
-                            if (currentPrice < order.price * (1 - tolerance)) {
-                                order.isProcessing = false;
-                                continue;
-                            }
-
-                            //  Confirmation delay (anti-spike)
-                            if (!order.triggeredAt) {
-                                order.triggeredAt = now;
-                                order.isProcessing = false;
-                                continue;
-                            }
-
-                            if (now - order.triggeredAt < 3000) {
-                                order.isProcessing = false;
-                                continue;
+                            if (currentPrice <= order.price) {
+                                // order.isProcessing = false;
+                                // continue;
+                                order.price = currentPrice ;
+                                shouldExecute=  true ;
                             }
                         }
-
-                        //  MARKET ORDER
+                            //  MARKET ORDER
                         if (order.orderType === "market") {
                             order.price = currentPrice;
                         }
+                            //  Prevent sudden spike execution (buffer zone)
+                            // const tolerance = 0.002; // 0.2%
+                            // if (currentPrice < order.price * (1 - tolerance)) {
+                            //     order.isProcessing = false;
+                            //     continue;
+                            // }
+
+                            //  Confirmation delay (anti-spike)
+
+                            if(shouldExecute){
+                                if (!order.triggeredAt) {
+                                    order.triggeredAt = now;
+                                    order.isProcessing = false;
+                                    continue;
+                                }
+
+                                if (now - order.triggeredAt < 3000) {
+                                    order.isProcessing = false;
+                                    continue;
+                                }
+                            }
+                        
+                            if(!shouldExecute){
+                                order.triggeredAt = null;
+                                order.isProcessing = false;
+                                continue;
+                            }
+                        
 
                         const totalAmount = order.price * order.quantity;
 
@@ -170,7 +180,7 @@ export function buyOrderExecuting() {
                         userUpdated = true;
 
                         console.log(`Executed: ${order.stock}`);
-
+                    
                     } catch (err) {
                         console.error(`Order Error (${order.stock}):`, err.message);
                         order.isProcessing = false;
@@ -185,6 +195,8 @@ export function buyOrderExecuting() {
                         order.isProcessing = true;
 
                         const now = Date.now();
+
+                        let shouldExecute = false;
 
                         //  Expiry check
                         if (order.validTill && now > new Date(order.validTill).getTime()) {
@@ -213,21 +225,28 @@ export function buyOrderExecuting() {
                         if (order.orderType === "limit") {
 
                             // Sell only if price >= target
-                            if (currentPrice < order.price) {
-                                order.triggeredAt = null;
-                                order.isProcessing = false;
-                                continue;
+                            if (currentPrice >= order.price) {
+                                // order.triggeredAt = null;
+                                // order.isProcessing = false;
+                                // continue;
+                                shouldExecute = true;
                             }
+                        }
 
-                            const tolerance = 0.002;
+                                                //  MARKET ORDER
+                        if (order.orderType === "market") {
+                            order.price = currentPrice;
+                        }
+                            // const tolerance = 0.002;
 
-                            if (currentPrice > order.price * (1 + tolerance)) {
-                                order.triggeredAt = null;
-                                order.isProcessing = false;
-                                continue;
-                            }
+                            // if (currentPrice > order.price * (1 + tolerance)) {
+                            //     order.triggeredAt = null;
+                            //     order.isProcessing = false;
+                            //     continue;
+                            // }
 
                             //  First trigger
+                            if(shouldExecute){
                             if (!order.triggeredAt) {
                                 order.triggeredAt = now;
                                 order.isProcessing = false;
@@ -239,12 +258,13 @@ export function buyOrderExecuting() {
                                 order.isProcessing = false;
                                 continue;
                             }
-                        }
+                            }
 
-                        //  MARKET ORDER
-                        if (order.orderType === "market") {
-                            order.price = currentPrice;
-                        }
+                            if(!shouldExecute){
+                                order.triggeredAt = null;
+                                order.isProcessing = false;
+                                continue;
+                            }
 
                         //  Check holding
                         const existingStock = user.holding.find(

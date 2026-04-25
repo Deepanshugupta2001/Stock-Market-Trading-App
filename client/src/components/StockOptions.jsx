@@ -1,25 +1,19 @@
 import React from 'react'
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { stockApi } from '../api/stockApi';
 import useStock from '../context/stockContext';
+import { useState } from 'react';
 
-const Watchlist = ({ onSelectStock }) => {
+const StockOptions = ({symbol}) => {
 
-  const {watchlist , stock ,removeStock , showChart, setStock,quantity , setQuantity , buyStock , sellStock} = useStock();
-  // let hua = false;
-  const [activeStock,setActiveStock] = useState(null);
-  const [sellStockState,setSellStockState] = useState(null);
-  const [orderType,setOrderType] = useState("market");
-  const [customPrice,setCustomPrice] = useState(0);
-  // const [purpose,setPurpose] = useState("Buy");
-  const [mode,setMode] = useState("normal");
-  
-  const removeHandler = async (symbol)=>{
-    const data = await removeStock(symbol);
-  }
-  
-  const getValidTill = (mode) =>{
+    const { stock ,buyStock , sellStock , quantity , setQuantity ,showChart} = useStock();
+    const [activeStock,setActiveStock] = useState(null);
+    const [sellStockState,setSellStockState] = useState(null);
+    const [orderType,setOrderType] = useState("market");
+    const [customPrice,setCustomPrice] = useState(0);
+    const [mode,setMode] = useState("normal");
+    
+    const selectedStock = stock.find(s => s && s.symbol && symbol && s.symbol.toUpperCase() === symbol.toUpperCase());
+    
+    const getValidTill = (mode) =>{
           const now = new Date();
 
           if(mode === "GTT" ) now.setDate(now.getDate() + 30);
@@ -27,11 +21,16 @@ const Watchlist = ({ onSelectStock }) => {
           else now.setDate(now.getDate() + 1);
 
           return now ;
-  }
-  // const showCharts = async (symbol)=>{
-  //   const data = await showChart(symbol);
-  // }
-  const buyHandler = async (symbol,type="normal")=>{
+    }
+
+    if (!symbol) {
+        return <div>Select a stock to view details</div>;
+    }
+
+    if (!selectedStock) {
+        return <div>Loading stock data...</div>;
+    }
+    const buyHandler = async (symbol,type="normal")=>{
     setActiveStock(symbol); 
     setMode(type);
   }
@@ -95,76 +94,37 @@ const Watchlist = ({ onSelectStock }) => {
     setOrderType("market");
   }
   return (
-    // <div>
+    <div style={{ border: "1px solid #ccc", padding: "15px", marginTop: "20px" }}>
+      <h2>{selectedStock.symbol}</h2>
 
-    //   <h3>Your Watchlist</h3>
-    //   {Array.isArray(stock) && stock.map((symbol) => 
+      <p>
+        <strong>Price:</strong> ₹{selectedStock.price}
+      </p>
 
-    //     <div
-    //       key={symbol}
-    //       onClick={() => onSelectStock(symbol)}
-    //       style={{cursor:"pointer"}}
-    //     >
-    //       {symbol}
-    //     </div>
+      <p
+        style={{
+          color: selectedStock.change >= 0 ? "green" : "red"
+        }}
+      >
+        <strong>Change:</strong> {selectedStock.change}
+      </p>
 
-    //   ))}
-
-    // </div>
-//     <div>
-//     <h3>Your Watchlist</h3>
-
-//     {watchlist.map(symbol => {
-
-//       const priceData = stock.find(s => s.symbol === symbol);
-
-//       return (
-//         <div key={symbol}>
-//           {symbol} : {priceData ? `₹${priceData.price}` : "Loading..."}
-//         </div>
-//       );
-
-//     })}
-
-//   </div>
-
-     <div>
-    <h3>Your Watchlist</h3>
-
-    {watchlist.map(symbol => {
-
-      // const priceData = stock.find(s => s.symbol === symbol);
-      const priceData = stock.find(s => s && s.symbol && s.symbol.toUpperCase() === symbol.toUpperCase());
-
-      return (
-        // <div key={symbol}>
-        //   {symbol} : {priceData?.price ?? "Loading..."}
-        <div 
-          key={symbol} 
-          onClick={() => onSelectStock && onSelectStock(symbol)}
-          style={{cursor: "pointer", padding: "8px", borderBottom: "1px solid #ccc", display: "flex", justifyContent: "space-between", alignItems: "center"}}
-        >
-          <span><strong>{symbol.toUpperCase()}</strong></span>
-          {priceData ? (
-            <span>
-              ₹{priceData.price}{" "}
-              <span style={{ color: priceData.change >= 0 ? "green" : "red" }}>
-                {priceData.change >= 0 ? "+" : ""}{priceData.change?.toFixed(2)}{" "}
-                ({priceData.percent?.toFixed(2)}%)
-              </span>
-            </span>
-          ) : (
-            <span>Loading...</span>
-          )}
-          <button onClick={(e)=>{
+      <p
+        style={{
+          color: selectedStock.percent >= 0 ? "green" : "red"
+        }}
+      >
+        <strong>Percent:</strong> {selectedStock.percent?.toFixed(2)}%
+      </p>
+        <button onClick={(e)=>{
             e.stopPropagation();
             onSelectStock(symbol);
           }}>Show Chart</button>
 
-          <button onClick={()=>buyHandler(symbol,"normal")}>Buy</button>
-          <button onClick={()=>buyHandler(symbol,"GTT")}>Buy GTT</button>
+      <button onClick={()=>buyHandler(symbol,"normal")}>Buy</button>
+        <button onClick={()=>buyHandler(symbol,"GTT")}>Buy GTT</button>
           {activeStock === symbol && ( 
-            <form onSubmit={(e)=> buyFormHandler(e,symbol,priceData?.price)}>
+            <form onSubmit={(e)=> buyFormHandler(e,symbol,selectedStock?.price)}>
               <p>{mode == "GTT" ? "GTT Order " : "Normal Order"}</p>
               <p>Quantity :</p>
               <input onChange={(e)=>setQuantity(e.target.value)} type="number" value={quantity} placeholder='Enter your quantity to purchase'></input>
@@ -177,8 +137,8 @@ const Watchlist = ({ onSelectStock }) => {
                 <input type='number' value={customPrice} onChange={(e)=>setCustomPrice(e.target.value)} placeholder='Enter your price at which you want to purchase'></input>
               )}
 
-              {orderType === "market" && priceData && (
-                <p>Buying at market price: Rs. {priceData.price}</p>
+              {orderType === "market" && selectedStock && (
+                <p>Buying at market price: Rs. {selectedStock.price}</p>
               )}
 
               <button type='submit'>Buy</button>
@@ -189,7 +149,7 @@ const Watchlist = ({ onSelectStock }) => {
           <button onClick={()=>sellHandler(symbol,"normal")}>Sell</button>
           <button onClick={()=>sellHandler(symbol,"GTT")}>Sell GTT</button>
           {sellStockState === symbol && ( 
-            <form onSubmit={(e)=> sellFormHandler(e,symbol,priceData?.price)}>
+            <form onSubmit={(e)=> sellFormHandler(e,symbol,selectedStock?.price)}>
               <p>{mode == "GTT" ? "GTT Order " : "Normal Order"}</p>
               <p>Quantity :</p>
               <input onChange={(e)=>setQuantity(e.target.value)} type="number" value={quantity} placeholder='Enter your quantity to sell'></input>
@@ -202,21 +162,15 @@ const Watchlist = ({ onSelectStock }) => {
                 <input type='number' value={customPrice} onChange={(e)=>setCustomPrice(e.target.value)} placeholder='Enter your price at which you want to sell'></input>
               )}
 
-              {orderType === "market" && priceData && (
-                <p>Selling at market price: Rs. {priceData.price}</p>
+              {orderType === "market" && selectedStock && (
+                <p>Selling at market price: Rs. {selectedStock.price}</p>
               )}
 
               <button type='submit'>Sell</button>
             </form>
           )}
-          <button onClick={()=> removeHandler(symbol)}>Remove</button>
-        </div>
-
-      );
-
-    })}
-  </div>
+    </div>
   )
 }
 
-export default Watchlist
+export default StockOptions
