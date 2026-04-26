@@ -3,7 +3,7 @@ import useStock from '../context/stockContext';
 
 const OrderList = ({onSelectStock}) => {
 
-    const {order, sellStock , buyStock , stock , quantity , setQuantity , orderDetails , showChart } = useStock();
+        const {order, sellStock , buyStock , stock , quantity , setQuantity , orderDetails , showChart } = useStock();
         const [activeStock,setActiveStock] = useState(null);
         const [sellStockState,setSellStockState] = useState(null);
         const [orderType,setOrderType] = useState("market");

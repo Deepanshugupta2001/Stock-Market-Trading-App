@@ -2,7 +2,7 @@ import React from 'react'
 import useStock from '../context/stockContext';
 import { useState } from 'react';
 
-const StockOptions = ({symbol}) => {
+const StockOptions = ({symbol , showCharts , setShowCharts}) => {
 
     const { stock ,buyStock , sellStock , quantity , setQuantity ,showChart} = useStock();
     const [activeStock,setActiveStock] = useState(null);
@@ -116,10 +116,7 @@ const StockOptions = ({symbol}) => {
       >
         <strong>Percent:</strong> {selectedStock.percent?.toFixed(2)}%
       </p>
-        <button onClick={(e)=>{
-            e.stopPropagation();
-            onSelectStock(symbol);
-          }}>Show Chart</button>
+        <button onClick={()=>setShowCharts(prev=> !prev)}>{showCharts ? "Hide Chart" : "Show Chart"}</button>
 
       <button onClick={()=>buyHandler(symbol,"normal")}>Buy</button>
         <button onClick={()=>buyHandler(symbol,"GTT")}>Buy GTT</button>
