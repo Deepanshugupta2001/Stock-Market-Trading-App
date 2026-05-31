@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import StockDetails from '../components/StockDetails'
-import useStock from '../context/stockContext';
 import OrderList from '../components/OrderList';
 import SearchStockOrderList from '../components/SearchStockOrderList';
-import { Navigate, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import ShowCharts from '../components/ShowCharts';
 const Orders = () => {
 
@@ -13,20 +12,37 @@ const Orders = () => {
   return (
 
     
-    <div>
-        <button onClick={()=>navigate('/dashboard')}>Dashboard</button>
+    <div className="page-shell orders-page">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">Orders</p>
+          <h1>Order Book</h1>
+          <p className="page-subtitle">Place orders, inspect status, and open price charts.</p>
+        </div>
+        <nav className="nav-actions">
+          <button onClick={()=>navigate('/dashboard')}>Dashboard</button>
+        </nav>
+      </header>
 
-     <SearchStockOrderList/>
+     <section className="panel">
+       <SearchStockOrderList/>
+     </section>
 
-    <StockDetails symbol={selectedStock} />
+    <section className="dashboard-grid">
+      <div className="panel">
+        <StockDetails symbol={selectedStock} />
+      </div>
 
-    <OrderList onSelectStock={setSelectedStock}/>
+      <div className="panel panel-strong">
+        <OrderList onSelectStock={setSelectedStock}/>
+      </div>
+    </section>
 
     {
         selectedStock && (
-          <div style={{marginTop: "20px"}}>
+          <section className="panel chart-panel">
             <ShowCharts symbol={selectedStock}/>
-          </div>
+          </section>
         )
       }
 

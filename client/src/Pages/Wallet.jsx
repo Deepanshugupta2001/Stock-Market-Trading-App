@@ -8,32 +8,28 @@ const Wallet = () => {
     const {wal} = useStock();
     
   return (
-    <div>
-      Welcome to Wallet
-<br/>
-        <br/><br/>
-        <br/>
-      Wallet : Rs. {wal}
-    <br/>
-        <br/>
-        <br/>
-      Wanna Add Money To Wallet ? 
-      <button onClick={()=>navigate('/addmoney')}>Add</button>
-        <br/>
-        <br/>
-        <br/>
-      Need Money ? Withdraw it .
-      <button onClick={()=>navigate('/withdrawmoney')}>Withdraw</button>
-      <br/>
-        <br/>
-        <br/>
-      Want to See Transcations ? Here you go 
-      <button onClick={()=>navigate('/transactions')}>Transactions</button>
-    <br/>
-    <br/>
-      Go Back To Dashboard 
-      <button onClick={()=>navigate('/dashboard')}>Dashboard</button>
+    <div className="page-shell narrow-page">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">Funds</p>
+          <h1>Wallet</h1>
+          <p className="page-subtitle">Manage balance and review wallet activity.</p>
+        </div>
+        <nav className="nav-actions">
+          <button onClick={()=>navigate('/dashboard')}>Dashboard</button>
+        </nav>
+      </header>
 
+      <section className="wallet-balance">
+        <span>Available Balance</span>
+        <strong>Rs. {wal}</strong>
+      </section>
+
+      <section className="action-grid">
+        <button onClick={()=>navigate('/addmoney')}>Add Money</button>
+        <button onClick={()=>navigate('/withdrawmoney')}>Withdraw</button>
+        <button onClick={()=>navigate('/transactions')}>Transactions</button>
+      </section>
     </div>
   )
 }

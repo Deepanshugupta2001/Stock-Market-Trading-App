@@ -19,32 +19,41 @@ const Dashboard = () => {
 
 
   return (
-    <div>
-        Welcome to Dashboard
-        <button onClick={()=>navigate('/profile')}>Profile</button>
-        <button onClick={()=>navigate('/portfolio')}>Portfolio</button>
-        <button id='logout' onClick={()=> logout()}>Logout</button>
-        <button onClick={()=>navigate('/wallet')}>Wallet</button>
-        <button onClick={()=>navigate('/orders')}>Orders</button>
+    <div className="page-shell dashboard-page">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">Stock Market Trading Platform</p>
+          <h1>Dashboard</h1>
+          <p className="page-subtitle">Search stocks, manage your watchlist, and open charts from one screen.</p>
+        </div>
+        <nav className="nav-actions" aria-label="Dashboard navigation">
+          <button onClick={()=>navigate('/profile')}>Profile</button>
+          <button onClick={()=>navigate('/portfolio')}>Portfolio</button>
+          <button onClick={()=>navigate('/wallet')}>Wallet</button>
+          <button onClick={()=>navigate('/orders')}>Orders</button>
+          <button className="button-danger" id='logout' onClick={()=> logout()}>Logout</button>
+        </nav>
+      </header>
 
-      <SearchStock/>
-      <StockDetails symbol={selectedStock} />
-      {/* <StockDetails/> */}
-      {/* <Watchlist onSelectStock={setSelectedStock} /> } */}
+      <section className="panel">
+        <SearchStock/>
+      </section>
 
-       {/* <Watchlist/> */}
-      <Watchlist onSelectStock={setSelectedStock} />
+      <section className="dashboard-grid">
+        <div className="panel">
+          <StockDetails symbol={selectedStock} />
+        </div>
+        <div className="panel panel-strong">
+          <Watchlist onSelectStock={setSelectedStock} />
+        </div>
+      </section>
 
-      {
-        selectedStock && (
-          <div style={{marginTop: "20px"}}>
-            <ShowCharts symbol={selectedStock}/>
-          </div>
-        )
-      }
-
+      {selectedStock && (
+        <section className="panel chart-panel">
+          <ShowCharts symbol={selectedStock}/>
+        </section>
+      )}
     </div>
-
   )
 }
 

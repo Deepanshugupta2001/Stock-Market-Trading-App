@@ -21,7 +21,11 @@ const Signup = () => {
   }
 
   return(
-  <>
+  <main className="auth-page">
+    <section className="auth-card">
+      <p className="eyebrow">Start trading</p>
+      <h1>Create account</h1>
+      <p className="page-subtitle">Set up your paper trading profile and wallet.</p>
     <form onSubmit={formSubmitHandler}>
       <input onChange={(e)=>setMobno(e.target.value)} value={mobno} type="text" placeholder='Enter Your Mobile Number' autoComplete='true'></input>
       <input onChange={e=> setName(e.target.value)} value={name} type="text" placeholder='Enter Your Name' autoComplete='true'></input>
@@ -29,8 +33,9 @@ const Signup = () => {
 
       <button type='submit'>Signup</button>
     </form>
-    Already a User ? <button onClick={()=>navigate('/login')}>Login</button>
-  </>
+    <p className="auth-switch">Already a user? <button onClick={()=>navigate('/login')}>Login</button></p>
+    </section>
+  </main>
   );
 }
 

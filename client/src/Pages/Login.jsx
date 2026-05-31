@@ -22,15 +22,20 @@ const Login = () => {
     }
   
     return(
-    <>
+    <main className="auth-page">
+      <section className="auth-card">
+        <p className="eyebrow">Welcome back</p>
+        <h1>Login</h1>
+        <p className="page-subtitle">Continue to your trading dashboard.</p>
       <form onSubmit={formSubmitHandler}>
         <input onChange={(e)=>setMobno(e.target.value)} value={mobno} type="text" placeholder='Enter Your Mobile Number' ></input>
         <input onChange={e=> setPassword(e.target.value)} value={password} type="password" placeholder='Enter Your Password' ></input>
   
         <button type='submit'>Login</button>
       </form>
-      Not a User ? Signup instead <button onClick={()=>navigate('/signup')}>Signup</button>
-    </>
+      <p className="auth-switch">Not a user? <button onClick={()=>navigate('/signup')}>Signup</button></p>
+      </section>
+    </main>
     );
 }
 

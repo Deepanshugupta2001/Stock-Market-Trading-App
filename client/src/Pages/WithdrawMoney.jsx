@@ -14,10 +14,16 @@ const WithdrawMoney = () => {
         navigate('/wallet');
     }
   return (
-    <div>
-      Welcome to Withdraw Money Page
+    <div className="page-shell narrow-page">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">Wallet</p>
+          <h1>Withdraw Money</h1>
+          <p className="page-subtitle">Move money out of your trading wallet.</p>
+        </div>
+      </header>
 
-      <form onSubmit={withdrawSubmitHandler}>
+      <form className="panel form-panel" onSubmit={withdrawSubmitHandler}>
         <input onChange={(e)=>setAmt(Number(e.target.value))} type='number' value={amt} placeholder='Enter Amount You want to Withdraw'></input>
         <button type='submit'>Withdraw Money</button>
       </form> 

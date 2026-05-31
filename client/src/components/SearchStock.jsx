@@ -1,26 +1,14 @@
-// import React from 'react'
-// import { useState } from 'react'
 import React, { useState, useEffect } from 'react'
 import { stockApi } from '../api/stockApi';
 import useStock from '../context/stockContext';
 
-const SearchStock = ({reload}) => {
-    // const [symbol, setSymbol] = useState("");
+const SearchStock = () => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const {addStock} = useStock();
 
-  //   const addstock = async (e)=>{
-  //       e.preventDefault();
-  //       const data = await addStock(symbol);
-  //       setSymbol("");
-  //   }
-  // return (
-  //   <div>
-  //     <form onSubmit={addstock}>
-  //       <input onChange={(e)=>setSymbol(e.target.value)} value={symbol} placeholder='Enter Stock Name'></input>
-      useEffect(() => {
+    useEffect(() => {
         if (query.trim().length === 0) {
             setResults([]);
             return;
@@ -37,12 +25,11 @@ const SearchStock = ({reload}) => {
             setLoading(false);
         };
 
-        const timeout = setTimeout(fetchResults, 400); // 400ms debounce
+        const timeout = setTimeout(fetchResults, 400);
         return () => clearTimeout(timeout);
     }, [query]);
 
-        // <button type='submit'>Add Stock</button>
-      const handleAdd = async (symbol) => {
+    const handleAdd = async (symbol) => {
         try {
             await addStock(symbol);
             setQuery("");
@@ -53,48 +40,31 @@ const SearchStock = ({reload}) => {
     };
 
   return (
-    <div style={{ position: "relative", marginBottom: "20px" }}>
+    <div className="search-box">
       <form onSubmit={(e) => { e.preventDefault(); handleAdd(query); }}>
-        <input 
-          onChange={(e)=>setQuery(e.target.value)} 
-          value={query} 
-          placeholder='Search Stock Name (e.g. Apple or AAPL)' 
-          style={{ width: "300px", padding: "8px" }}
+        <input
+          onChange={(e)=>setQuery(e.target.value)}
+          value={query}
+          placeholder='Search Stock Name (e.g. Apple or AAPL)'
         />
-        <button type='submit' style={{ padding: "8px", marginLeft: "10px" }}>Add</button>
-        {loading && <span style={{marginLeft: "10px"}}>Searching...</span>}
+        <button type='submit'>Add</button>
+        {loading && <span className="status-text">Searching...</span>}
       </form>
-      
+
       {results.length > 0 && (
-          <div style={{
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              width: "300px",
-              background: "#fff",
-              border: "1px solid #ccc",
-              maxHeight: "200px",
-              overflowY: "auto",
-              zIndex: 10
-          }}>
+          <div className="search-results">
               {results.map((result, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     onClick={() => handleAdd(result.symbol)}
-                    style={{
-                        padding: "8px",
-                        borderBottom: "1px solid #eee",
-                        cursor: "pointer",
-                        color: "#000"
-                    }}
+                    className="search-result-item"
                   >
-                      <strong>{result.symbol}</strong> - {result.shortname} 
-                      <small style={{display: "block", color: "#666"}}>{result.exchange}</small>
+                      <strong>{result.symbol}</strong> - {result.shortname}
+                      <small>{result.exchange}</small>
                   </div>
               ))}
           </div>
       )}
-      {/* </form> */}
     </div>
   )
 }

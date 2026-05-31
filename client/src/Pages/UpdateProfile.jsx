@@ -69,11 +69,22 @@ const UpdateProfile = () => {
     }
 
   return (
-    <div>
-      Welcome to Update Profile Page <br/>
+    <div className="page-shell narrow-page">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">Account settings</p>
+          <h1>Update Profile</h1>
+          <p className="page-subtitle">Change your name, password, or account status.</p>
+        </div>
+        <nav className="nav-actions">
+          <button onClick={()=>navigate('/dashboard')}>Dashboard</button>
+          <button onClick={()=>navigate('/profile')}>Profile</button>
+        </nav>
+      </header>
 
-      Change Name : 
-      <form onSubmit={formSubmitHandler}>
+      <section className="settings-grid">
+      <form className="panel form-panel" onSubmit={formSubmitHandler}>
+        <h2>Change Name</h2>
 
         <input onChange={(e)=>setName(e.target.value)} value={name} type="text" placeholder='Enter Your New Name' ></input>
 
@@ -81,9 +92,8 @@ const UpdateProfile = () => {
       <button type='submit'>Click Here</button>
       </form>
 
-      Change Password : 
-
-      <form onSubmit={passwordSubmitHandler}>
+      <form className="panel form-panel" onSubmit={passwordSubmitHandler}>
+        <h2>Change Password</h2>
         <input onChange={(e)=>setPasswordOld(e.target.value)} value={passwordold} type='password' placeholder='Enter Your Old Password'></input>
         <input onChange={(e)=>setPassword(e.target.value)} value={password} type='password' placeholder='Enter Your New Password'></input>
         <input onChange={(e)=>setPasswordNew(e.target.value)} value={passwordnew} type='password' placeholder='Enter Your New Password'></input>
@@ -91,16 +101,15 @@ const UpdateProfile = () => {
       <button type='submit'>Click Here</button>
       </form>
 
-      Delete Account ? Think Once Before Deleting .   
-      <form onSubmit={deleteSubmitHandler}>
+      <form className="panel form-panel danger-panel" onSubmit={deleteSubmitHandler}>
+        <h2>Delete Account</h2>
+        <p>Think once before deleting your account.</p>
         <input onChange={(e)=>setDeletePassword(e.target.value)} value={deletepassword} type='password' placeholder='Enter Your Password'></input>
         
-       <button type='submit'>Delete</button>
+       <button className="button-danger" type='submit'>Delete</button>
 
       </form>
-      
-      <button onClick={()=>navigate('/dashboard')}>Dashboard</button>
-      <button onClick={()=>navigate('/profile')}>Profile</button>
+      </section>
 
     </div>
   )
