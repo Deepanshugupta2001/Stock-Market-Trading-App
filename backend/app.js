@@ -31,7 +31,7 @@ app.use('/api/stock',stockRoutes);
 // Testing Purpose :
 // const quote = await yahooFinance.quote("AAPL");
 // console.log(quote.regularMarketPrice);
-mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect(env.DATABASE_URL)
     .then(()=>{
         httpServer.listen(PORT,()=>{
             console.log(`http://localhost:`+PORT);

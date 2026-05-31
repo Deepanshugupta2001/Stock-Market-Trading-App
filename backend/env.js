@@ -2,10 +2,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const env = {
-    CORS_ORIGIN : process.env.CORS_ORIGIN || "http:localhost:5173",
+    CORS_ORIGIN : process.env.CORS_ORIGIN || "http://localhost:5173",
     PORT : process.env.PORT || 4444,
     JWT_SECRET : process.env.JWT_SECRET,
-    DATABASE_URL : process.env.DATABASE_URL
+    DATABASE_URL : process.env.DATABASE_URL || "mongodb://localhost:27017/stocks"
 }
 
 export default env;

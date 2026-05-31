@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export default axios.create({
-    baseURL : 'https://stock-market-trading-app.onrender.com',
+    baseURL : import.meta.env.VITE_API_URL || 'http://localhost:4444',
 });

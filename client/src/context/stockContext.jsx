@@ -7,7 +7,7 @@ import {io} from 'socket.io-client';
 import { useEffect } from 'react';
 const stockcontext = createContext();
 
-const socket = io("http://localhost:4444");
+const socket = io(import.meta.env.VITE_API_URL || "http://localhost:4444");
 
 export const StockProvider = ({children}) =>{
     const [stock,setStock] = useState([]);

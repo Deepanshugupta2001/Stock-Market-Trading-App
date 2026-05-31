@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import Stock from "../model/Stock.js";
 // import { stockData } from "../http/services/stock.service.js";
 import { getPrices, updatePrices } from "../http/services/priceCache.js";
+import env from "../env.js";
 
 let activeSymbols = new Set();
 let userSubscriptions = new Map();
@@ -10,7 +11,7 @@ export function startsocket(httpServer){
 
     const io = new Server(httpServer,{
     cors: {
-        origin: "http://localhost:5173"
+        origin: env.CORS_ORIGIN
     }
 });
 
