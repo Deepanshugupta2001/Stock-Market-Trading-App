@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export default axios.create({
-    baseURL : 'http://localhost:4444',
+    baseURL : 'https://stock-market-trading-app.onrender.com',
 });
